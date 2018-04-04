@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Reactive" Version="3.1.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Fleck">
+      <HintPath>..\..\..\..\..\..\NET\Linux\Fleck-master\src\Fleck\bin\Debug\Fleck.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>
