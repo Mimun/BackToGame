@@ -18,6 +18,7 @@ namespace GameFoundation
                 socket.OnOpen = () =>
                 {
                     Console.WriteLine("Open!");
+                    Console.WriteLine("detail: " + socket.ToString());
                     socketList.Add(socket);
                 };
                 socket.OnClose = () =>

@@ -1,0 +1,36 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script>
+        $(function () {
+            var webSocket = window.WebSocket || window.MozWebSocket,
+                ws = new webSocket('ws://localhost:8765/test');
+
+            ws.onopen = function (e) {
+                console.log('Connection opened');
+            }
+
+            ws.onclose = function (e) {
+                console.log('Connection closed');
+            }
+
+            ws.onmessage = function (e) {
+                //var dataObject = JSON.parse(e.data);
+                //console.log(dataObject);
+                console.log(e);
+                console.log(e.data);
+                // ws.send(" I am here.. available");
+            }
+        });
+    </script>
+</head>
+
+<body>
+
+
+</body>
+</html>
