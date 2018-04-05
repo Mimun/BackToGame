@@ -7,12 +7,13 @@ namespace GameFoundation
 {
     public static class Utils
     {
-        public static IDisposable setTimeout(Action action, double timeSpan)
+        public static IDisposable SetTimeout(Action action, double timeSpan)
         {
             var result = Observable.Timer(TimeSpan.FromMilliseconds(0), TimeSpan.FromMilliseconds(timeSpan)).Subscribe(_=>action?.Invoke());
             return result;
         }
-        public static IDisposable setInterval(Action action, int timeSpan) {
+        public static IDisposable SetInterval(Action action, int timeSpan) {
+            var result = Observable.Timer(TimeSpan.FromMilliseconds(timeSpan), TimeSpan.FromMilliseconds(timeSpan)).Subscribe(_ => action?.Invoke());
             return null;
         }
     }
