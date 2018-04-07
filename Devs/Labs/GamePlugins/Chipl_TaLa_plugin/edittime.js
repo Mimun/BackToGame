@@ -1,8 +1,8 @@
 ﻿function GetPluginSettings()
 {
 	return {
-		"name":			"GameTLPlugin",				// as appears in 'insert object' dialog, can be changed as long as "id" stays the same
-		"id":			"GameTLPlugin",				// this is used to identify this plugin and is saved to the project; never change it
+		"name":			"GameTaLaPlugin",				// as appears in 'insert object' dialog, can be changed as long as "id" stays the same
+		"id":			"GameTaLaPlugin",				// this is used to identify this plugin and is saved to the project; never change it
 		"version":		"1.0",					// (float in x.y format) Plugin version - C2 shows compatibility warnings based on this
 		"description":	"Send and Receive the TL Card command from Server",
 		"author":		"Chipl/opensoft>",
@@ -93,7 +93,12 @@ AddStringParam("URL", "Enter the WebSocket server to connect to.", "\"ws://\"");
 AddStringParam("Protocol (optional)", "Enter a required sub-protocol the server must support in order to establish a connection.  Leave empty for no protocol requirement.");
 AddAction(1, af_none, "Connect", "Connection", "Connect to <i>{0}</i> (require protocol {1})", "Connect to a WebSocket server.", "Connect");
 
+// Close
+AddAction(2, af_none, "Close", "Connection", "Close connection", "Close any active WebSocket connection.", "Close");
 
+// Send
+AddStringParam("Data", "A text string to send to the server.");
+AddAction(3, af_none, "Send text", "Data", "Send text <i>{0}</i>", "Send a text string to the server.", "Send");
 ////////////////////////////////////////
 // Expressions
 

@@ -3,12 +3,29 @@
 
 assert2(cr, "cr namespace not created");
 assert2(cr.plugins_, "cr.plugins_ not created");
+/// Global objects and function 
+var userHandler = {}
+userHandler.setUserInfo = function (user){
+	userHandler.userInfo = user;
+}
+
+//  Test region
+ var user = {
+	name: 'chipl',
+	avatarUrl: "something.png",
+	jwt: "aabbcccderfd",
+	game: "Tala",
+	roomId: 1,
+	roomName: "Meocon"
+};
+
+userHandler.setUserInfo(user);
 
 /////////////////////////////////////
 // Plugin class
 // *** CHANGE THE PLUGIN ID HERE *** - must match the "id" property in edittime.js
 //          vvvvvvvv
-cr.plugins_.GameTLPlugin = function(runtime)
+cr.plugins_.GameTaLaPlugin = function(runtime)
 {
 	this.runtime = runtime;
 };
@@ -18,7 +35,7 @@ cr.plugins_.GameTLPlugin = function(runtime)
 	/////////////////////////////////////
 	// *** CHANGE THE PLUGIN ID HERE *** - must match the "id" property in edittime.js
 	//                            vvvvvvvv
-	var pluginProto = cr.plugins_.GameTLPlugin.prototype;
+	var pluginProto = cr.plugins_.GameTaLaPlugin.prototype;
 		
 	/////////////////////////////////////
 	// Object type class
@@ -48,14 +65,18 @@ cr.plugins_.GameTLPlugin = function(runtime)
 	
 	var instanceProto = pluginProto.Instance.prototype;
 
+	var userInfo = {};
+
+	
 	// called whenever an instance is created
 	instanceProto.onCreate = function()
 	{
 		// note the object is sealed after this call; ensure any properties you'll ever need are set on the object
 		// e.g...
-		// this.myValue = 0;
-
+		// this.myValue = 0;		
 		// Chipl Code Start here
+		this.userInfo = userHandler.userInfo;
+		// console.log('userInfo:', this.userInfo)
 		// Chipl Code End here
 	};
 	
@@ -199,32 +220,54 @@ cr.plugins_.GameTLPlugin = function(runtime)
 
 	// Connect to Server
 	Acts.prototype.Connect = function (ws_url, protocol){
-		console.log("url: ", ws_url);
-		console.log("other: ", protocol);
+		
 		if (this.ws){
 			this.ws.close();
 		}
-		var self = this
+		var self = this;
 		var webSocket = window.WebSocket || window.MozWebSocket;
 		this.ws = new webSocket(ws_url);
-		this.ws.onopen = function (e) {
-        	// console.log('Connection opened', e);			
-			self.runtime.trigger(cr.plugins_.GameTLPlugin.prototype.cnds.OnOpened,self);
+		this.ws.onopen = function (e) {        	
+			do {
+			}
+			while (self.ws.readyState !== 1);
+			// self.ws.send("Iam here")	;
+			// Chipl code
+			self.runtime.trigger(cr.plugins_.GameTaLaPlugin.prototype.cnds.OnOpened,self);
+			
+			if (self.userInfo){
+				self.ws.send( JSON.stringify(self.userInfo));
+			}
+			
         }
 
         this.ws.onclose = function (e) {
-                console.log('Connection closed');
+            self.runtime.trigger(cr.plugins_.GameTaLaPlugin.prototype.cnds.OnClosed,self);
         }
 
         this.ws.onmessage = function (e) {
                 //var dataObject = JSON.parse(e.data);
                 //console.log(dataObject);
-                console.log(e);
+                // console.log("Event: ",e);
                 console.log(e.data);
                 // ws.send(" I am here.. available");
         }
 
 	}
+
+	Acts.prototype.Close = function ()
+	{
+		if (this.ws)
+			this.ws.close();
+	};
+	
+	Acts.prototype.Send = function (msg_)
+	{		
+		if (!this.ws || this.ws.readyState !== 1 /* OPEN */){			
+			return;
+		}			
+		this.ws.send(msg_);
+	};
 	
 	// ... other actions here ...
 	

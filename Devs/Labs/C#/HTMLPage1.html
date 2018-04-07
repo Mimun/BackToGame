@@ -1,36 +1,87 @@
 ﻿<!DOCTYPE html>
-
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+
 <head>
     <meta charset="utf-8" />
     <title></title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script>
-        $(function () {
-            var webSocket = window.WebSocket || window.MozWebSocket,
-                ws = new webSocket('ws://localhost:8765/test');
+    $(function() {
+        var webSocket = window.WebSocket || window.MozWebSocket,
+            ws = new webSocket('ws://localhost:8765');
 
-            ws.onopen = function (e) {
-                console.log('Connection opened');
-            }
+        var user1 = {
+            name: 'chipl_1',
+            avatarUrl: "something.png",
+            jwt: "aabbcccderfd",
+            game: "Tala",
+            roomId: 1,
+            roomName: "Meocon"
+        };
 
-            ws.onclose = function (e) {
-                console.log('Connection closed');
-            }
+        var user2 = {
+            name: 'chipl_2',
+            avatarUrl: "something.png",
+            jwt: "aabbcccderfd",
+            game: "Tala",
+            roomId: 1,
+            roomName: "Meocon"
+        };
 
-            ws.onmessage = function (e) {
-                //var dataObject = JSON.parse(e.data);
-                //console.log(dataObject);
-                console.log(e);
-                console.log(e.data);
-                // ws.send(" I am here.. available");
-            }
-        });
+        var user3 = {
+            name: 'chipl_3',
+            avatarUrl: "something.png",
+            jwt: "aabbcccderfd",
+            game: "Tala",
+            roomId: 1,
+            roomName: "Meocon"
+        };
+
+        var user4 = {
+            name: 'chipl_4',
+            avatarUrl: "something.png",
+            jwt: "aabbcccderfd",
+            game: "Tala",
+            roomId: 1,
+            roomName: "Meocon"
+        };
+
+        var user5 = {
+            name: 'chipl_5',
+            avatarUrl: "something.png",
+            jwt: "aabbcccderfd",
+            game: "Tala",
+            roomId: 2,
+            roomName: "Meocon"
+        };
+
+        ws.binaryType = "arraybuffer";
+        ws.onopen = function(e) {
+            console.log('Connection opened');
+            console.log("WS ready state:", ws.readyState)
+            ws.send(JSON.stringify(user1));
+            ws.send(JSON.stringify(user2));
+            ws.send(JSON.stringify(user3));
+            ws.send(JSON.stringify(user4));
+            ws.send(JSON.stringify(user5));
+        }
+
+        ws.onclose = function(e) {
+            console.log('Connection closed');
+        }
+
+        ws.onmessage = function(e) {
+            //var dataObject = JSON.parse(e.data);
+            //console.log(dataObject);
+            console.log(e);
+            console.log(e.data);
+            // ws.send(" I am here.. available");
+        }
+    });
     </script>
 </head>
 
 <body>
-
-
 </body>
+
 </html>
