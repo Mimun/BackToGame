@@ -7,9 +7,10 @@ namespace GameFoundation.GameUtils
 {
     class Player : IDisposable
     {
-
         public string playerName;
+        public string playerUID;
         public string playerJwt;
+        public float playerBalance;
         public string playerRoomName;
         public string playerRoomId;
         public string avatarUrl;
