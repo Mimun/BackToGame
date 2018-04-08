@@ -18,7 +18,6 @@ namespace GameFoundation
             List<IWebSocketConnection> socketList = new List<IWebSocketConnection>();
             IWebSocketServer gameServer = new WebSocketServer("ws://0.0.0.0:8765");
 
-
             gameServer.Start(socket =>
                 {
 
@@ -49,26 +48,25 @@ namespace GameFoundation
                         }
                         if (pl != null && pl.GetType()== typeof(Player))
                         {
+                            // assign websocket for each player to reusage in next steps
+                            pl.playerWebsocket = socket;
                             // Do something here
-                            Console.WriteLine("Good Job" + pl.ToString());
-                            StartPoint.roomList.ForEach(r =>
-                            {
-                                if (r.RoomId == pl.playerRoomId)
-                                {
-                                    // JoinInRoom
-                                    r.addPlayer(pl);
+                            for (int i = 0;i<= StartPoint.roomList.Count; i++)
+                            {                                
+                                if (  StartPoint.roomList.Count >0 && StartPoint.roomList[i].RoomId == pl.playerRoomId)
+                                {                               
+                                        StartPoint.roomList[i].addPlayer(pl);
+                                        break;                                   
                                 }
                                 else
-                                {
-                                    // CreateNewRoom
-                                    Room newRoom = new Room(pl);
-                                    StartPoint.roomList.Add(newRoom);
+                                {                                    
+                                    StartPoint.roomList.Add(new Room(pl));
+                                    break;
                                 }
-                            });
+                            }
                         }
 
                         Console.WriteLine(roomList.Count);
-
                         socketList.ToList().ForEach(s => s.Send("Echo: " + message));
                     };
                 });

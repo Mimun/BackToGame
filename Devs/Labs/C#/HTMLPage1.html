@@ -9,50 +9,55 @@
     $(function() {
         var webSocket = window.WebSocket || window.MozWebSocket,
             ws = new webSocket('ws://localhost:8765');
-
+            // 
+       	// public string playerName;
+        // public string playerJwt;
+        // public string playerRoomName;
+        // public string playerRoomId;
+        // public string avatarUrl;
         var user1 = {
-            name: 'chipl_1',
+            playerName: 'chipl_1',
             avatarUrl: "something.png",
-            jwt: "aabbcccderfd",
+            playerJwt: "aabbcccderfd",
             game: "Tala",
-            roomId: 1,
-            roomName: "Meocon"
+            playerRoomId: 1,
+            playerRoomName: "Meocon"
         };
 
         var user2 = {
-            name: 'chipl_2',
+            playerName: 'chipl_2',
             avatarUrl: "something.png",
-            jwt: "aabbcccderfd",
+            playerJwt: "aabbcccderfd",
             game: "Tala",
-            roomId: 1,
-            roomName: "Meocon"
+            playerRoomId: 1,
+            playerRoomName: "Meocon"
         };
 
         var user3 = {
-            name: 'chipl_3',
+            playerName: 'chipl_3',
             avatarUrl: "something.png",
-            jwt: "aabbcccderfd",
+            playerJwt: "aabbcccderfd",
             game: "Tala",
-            roomId: 1,
-            roomName: "Meocon"
+            playerRoomId: 1,
+            playerRoomName: "Meocon"
         };
 
         var user4 = {
-            name: 'chipl_4',
+            playerName: 'chipl_4',
             avatarUrl: "something.png",
-            jwt: "aabbcccderfd",
+            playerJwt: "aabbcccderfd",
             game: "Tala",
-            roomId: 1,
-            roomName: "Meocon"
+            playerRoomId: 1,
+            playerRoomName: "Meocon"
         };
 
         var user5 = {
-            name: 'chipl_5',
+            playerName: 'chipl_5',
             avatarUrl: "something.png",
-            jwt: "aabbcccderfd",
+            playerJwt: "aabbcccderfd",
             game: "Tala",
-            roomId: 2,
-            roomName: "Meocon"
+            playerRoomId: 2,
+            playerRoomName: "Meocon"
         };
 
         ws.binaryType = "arraybuffer";

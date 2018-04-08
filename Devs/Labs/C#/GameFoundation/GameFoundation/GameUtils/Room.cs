@@ -14,6 +14,7 @@ namespace GameFoundation.GameUtils
         {
             this.RoomId = pl.playerRoomId;
             this.RoomName = pl.playerRoomName;
+            this.playerLists.Add(pl);
         }
 
         public void addPlayer(Player pl){
