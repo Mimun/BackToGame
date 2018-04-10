@@ -2,10 +2,13 @@
 using System.Collections.Generic;
 using System.Text;
 using Fleck;
+using System.Dynamic;
+using Newtonsoft.Json;
+using System.Linq;
 
 namespace GameFoundation.GameUtils
 {
-    class Player : IDisposable
+    public class Player : IDisposable
     {
         public string playerName;
         public string playerUID;
@@ -14,7 +17,7 @@ namespace GameFoundation.GameUtils
         public string playerRoomName;
         public string playerRoomId;
         public string avatarUrl;
-        public IWebSocketConnection playerWebsocket;
+        public List<IWebSocketConnection> playerWebsocketList = new List<IWebSocketConnection>();
 
 
         #region IDisposable Support
@@ -55,21 +58,38 @@ namespace GameFoundation.GameUtils
 
 
         #region GameRule
-        public Player( string playerName,
-            string playerJwt,
-            string playerRoomName,
-            string playerRoomId,
-            string avatarUrl,
-            IWebSocketConnection playerWebsocket )
-        {
-            this.playerName = playerName;
-            this.playerJwt = playerJwt;
-            this.playerRoomName = playerRoomName;
-            this.playerRoomId = playerRoomId;
-            this.avatarUrl = avatarUrl;
-            this.playerWebsocket = playerWebsocket;
-        }
+        //public Player( string playerName,
+        //    string playerJwt,
+        //    string playerRoomName,
+        //    string playerRoomId,
+        //    string avatarUrl,
+        //    IWebSocketConnection playerWebsocket )
+        //{
+        //    this.playerName = playerName;
+        //    this.playerJwt = playerJwt;
+        //    this.playerRoomName = playerRoomName;
+        //    this.playerRoomId = playerRoomId;
+        //    this.avatarUrl = avatarUrl;
+        //    this.playerWebsocketList.Add(playerWebsocket);
+        //}
         #endregion
+
+        public void Send(Player pl, String msgEvent)
+        {
+            dynamic expando = new ExpandoObject();
+            expando.avatarUrl = pl.avatarUrl;
+            expando.playerName = pl.playerName;
+            expando.playerRoomId = pl.playerRoomId;
+            expando.playerRoomName = pl.playerRoomName;
+            expando.playerUID = pl.playerUID;
+            expando.playerBalance = pl.playerBalance;
+            expando.msgEvent = msgEvent;
+
+            this.playerWebsocketList.ForEach(s=> {
+                //Console.WriteLine("s: " + s.ToString() + " : "+JsonConvert.SerializeObject(expando));
+                s.Send(JsonConvert.SerializeObject(expando));
+            });
+        }
 
     }
 }
