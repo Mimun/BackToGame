@@ -19,6 +19,7 @@ namespace GameFoundation.GameUtils
 		public string playerRoomId;
 		public string avatarUrl;
 		public Room playerRoom;
+		public int pos_in_room = -1 ;
 
 		public List<IWebSocketConnection> playerWebsocketList = new List<IWebSocketConnection>();
 
@@ -97,6 +98,7 @@ namespace GameFoundation.GameUtils
 			expando.playerRoomName = pl.playerRoomName;
 			expando.playerUID = pl.playerUID;
 			expando.playerBalance = pl.playerBalance;
+			expando.post = pl.pos_in_room;
 			expando.msgEvent = msgEvent;
 
 			this.playerWebsocketList.ForEach(s =>

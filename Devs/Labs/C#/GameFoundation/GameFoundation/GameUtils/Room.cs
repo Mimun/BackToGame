@@ -21,16 +21,17 @@ namespace GameFoundation.GameUtils
 		public void addPlayer(Player pl)
 		{
 			Players.Add(pl);
-			this.Broadcast(pl, StaticEvent.JOIN_OR_CREATE_ROOM_SERVER_to_CLIENT);
-			/*
-			Players.ForEach(p =>
-			{
-				// 1. Send information of new player to everyone in room
-				p.Send(pl, StaticEvent.JOIN_OR_CREATE_ROOM_SERVER_to_CLIENT);
-				// 2. Send information of everyone in room to a new player
-				pl.Send(p, StaticEvent.JOIN_OR_CREATE_ROOM_SERVER_to_CLIENT);
+			//(position in game to calculate respective postion in display of each player)
+			#region Assign position for player 
+			int post = 0;			
+			Players.ForEach(p => {
+				if (p.pos_in_room == -1) {
+					p.pos_in_room = post;					
+				}
+				post++;
 			});
-			*/
+			#endregion
+			this.Broadcast(pl, StaticEvent.JOIN_OR_CREATE_ROOM_SERVER_to_CLIENT);
 		}
 
 		public void Broadcast(Player pl, string msgEvent)

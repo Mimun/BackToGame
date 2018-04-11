@@ -46,7 +46,7 @@ namespace GameFoundation.GameUtils
 				pl.playerRoom = room;
 			}
 			#endregion
-
+			
 			return pl;
 		}
 	}
