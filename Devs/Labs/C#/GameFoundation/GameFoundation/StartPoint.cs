@@ -31,16 +31,16 @@ namespace GameFoundation
 
 					if (WebSocketClientManager.Remove(socket, out Player pl))
 					{
-						pl.playerWebsocketList.Remove(socket);
-						if (pl.playerWebsocketList.Count < 1)
+						//pl.playerWebsocketList.Remove(socket);
+						pl.AllConnections.Remove(socket);
+						if (pl.AllConnections.Count < 1)
 						{
 							pl.playerRoom.removePlayer(pl);
 						}
-						Console.WriteLine("WebsocketManager count: " + WebSocketClientManager.Count);
+						Console.WriteLine("WebsocketManager count: {0}", WebSocketClientManager.Count);
 					}
-					
-
 				};
+
 				socket.OnMessage = message =>
 				{
 					//Console.WriteLine(message);                        
@@ -50,25 +50,26 @@ namespace GameFoundation
 						// https://weblog.west-wind.com/posts/2012/Aug/30/Using-JSONNET-for-dynamic-JSON-parsing
 						Player pl = JsonConvert.DeserializeObject<Player>(message);
 						dynamic expando = JsonConvert.DeserializeObject<ExpandoObject>(message);
+						//JOIN_OR_CREATE_ROOM_CLIENT_to_SERVER
 						if (expando.msgEvent == StaticEvent.JOIN_OR_CREATE_ROOM_CLIENT_to_SERVER)
 						{
 							if (pl != null)
 							{
 								Player player = StaticEvent.CreateOrJoin_Handler(pl, socket);
 								WebSocketClientManager.TryAdd(socket, player);
-								Console.WriteLine("WebsocketManager count: " + WebSocketClientManager.Count + " Room: " + player.playerRoom.ID);
+								Console.WriteLine("WebsocketManager count: {0} Room {1}", WebSocketClientManager.Count , player.playerRoom.ID);
 							}
-
 						}
+						//
+						//
 					}
 					catch (Exception ext)
 					{
 						Console.WriteLine(ext.ToString());
 					}
-						//Console.WriteLine(StaticEvent.roomList.Count);
-						/*socketList.ToList().ForEach(s => s.Send("Echo: " + message))*/;
-
 				};
+				
+				
 			});
 
 			var input = Console.ReadLine();

@@ -25,7 +25,7 @@ namespace GameFoundation.GameUtils
 			// not in any room
 			if (room == null)
 			{
-				pl.playerWebsocketList.Add(socket);
+				pl.AllConnections.Add(socket);
 				room = new Room(pl);
 				pl.playerRoom = room;
 				StaticEvent.roomList.Add(room);
@@ -35,12 +35,12 @@ namespace GameFoundation.GameUtils
 				if (room.Players.FirstOrDefault(p => p.playerName == pl.playerName) != null)
 				{
 					pl = room.Players.FirstOrDefault(p => p.playerName == pl.playerName);
-					pl.playerWebsocketList.Add(socket);
+					pl.AllConnections.Add(socket);
 					room.Broadcast(pl, StaticEvent.JOIN_OR_CREATE_ROOM_SERVER_to_CLIENT);
 				}
 				else
 				{
-					pl.playerWebsocketList.Add(socket);
+					pl.AllConnections.Add(socket);
 					room.addPlayer(pl);
 				}
 				pl.playerRoom = room;

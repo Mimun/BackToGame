@@ -21,7 +21,7 @@ namespace GameFoundation.GameUtils
 		public Room playerRoom;
 		public int pos_in_room = -1 ;
 
-		public List<IWebSocketConnection> playerWebsocketList = new List<IWebSocketConnection>();
+		private List<IWebSocketConnection> playerWebsocketList = new List<IWebSocketConnection>();
 
 		public ConcurrentDictionary<string, List<IWebSocketConnection>> Connections { get; set; } = new ConcurrentDictionary<string, List<IWebSocketConnection>>();
 
@@ -29,10 +29,11 @@ namespace GameFoundation.GameUtils
 		{
 			get
 			{
-				var connections = new List<IWebSocketConnection>();
-				foreach (var kvp in this.Connections)
-					connections.AddRange(kvp.Value);
-				return connections;
+				return this.playerWebsocketList;
+			}
+			set
+			{
+				this.playerWebsocketList = value;				
 			}
 		}
 
@@ -98,7 +99,7 @@ namespace GameFoundation.GameUtils
 			expando.playerRoomName = pl.playerRoomName;
 			expando.playerUID = pl.playerUID;
 			expando.playerBalance = pl.playerBalance;
-			expando.post = pl.pos_in_room;
+			expando.post = Utils.Calculate_DislayPost(this,pl);
 			expando.msgEvent = msgEvent;
 
 			this.playerWebsocketList.ForEach(s =>
