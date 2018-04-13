@@ -90,7 +90,7 @@ namespace GameFoundation.GameUtils
 		//}
 		#endregion
 
-		public void Send(Player pl, String msgEvent)
+		public void Send(Player pl, String msgEvent, String value = null)
 		{
 			dynamic expando = new ExpandoObject();
 			expando.avatarUrl = pl.avatarUrl;
@@ -101,6 +101,7 @@ namespace GameFoundation.GameUtils
 			expando.playerBalance = pl.playerBalance;
 			expando.post = Utils.Calculate_DislayPost(this,pl);
 			expando.msgEvent = msgEvent;
+			expando.value = value;
 
 			this.playerWebsocketList.ForEach(s =>
 			{

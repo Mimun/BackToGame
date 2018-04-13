@@ -56,7 +56,7 @@
 				
 // example				
 AddNumberParam("Number", "Enter a number to test if positive.");
-AddCondition(0, cf_none, "Is number positive", "My category", "{0} is positive", "Description for my condition!", "MyCondition");
+AddCondition(0, cf_none, "Is number positive", "Game Event", "{0} is positive", "Description for my condition!", "MyCondition");
 
 AddCondition(1, cf_trigger, "On opened", "Connection", "On connection opened", "Triggered when the connection to the WebSocket server is successfully established.", "OnOpened");
 
@@ -71,6 +71,15 @@ AddCondition(5, cf_none, "Is open", "Connection", "Is connection open", "True if
 AddCondition(6, cf_none, "Is connecting", "Connection", "Is connecting", "True if the connection is currently being established.", "IsConnecting");
 
 AddCondition(7, cf_none, "Is supported", "Connection", "Is WebSocket supported", "True if the user's client supports WebSocket connections.", "IsSupported");
+
+// Game Events from Chipl
+AddCondition(8, cf_trigger, "On new Player", "Game Events", "New Player join in", "True if new Player is joined in Game", "NewPlayerJoin");
+
+AddCondition(9, cf_trigger, "Player Left Room", "Game Events", "Player left room", "True if new Player is joined in Game", "PlayerLeft");
+
+AddNumberParam("Player Number", "Enter a number to check if player is existed.");
+AddCondition(10, cf_none, "Check Player is existed", "Game Event", "{0} is positive", "Description for my condition!", "CheckPlayer");
+//
 
 ////////////////////////////////////////
 // Actions
@@ -99,6 +108,9 @@ AddAction(2, af_none, "Close", "Connection", "Close connection", "Close any acti
 // Send
 AddStringParam("Data", "A text string to send to the server.");
 AddAction(3, af_none, "Send text", "Data", "Send text <i>{0}</i>", "Send a text string to the server.", "Send");
+
+
+
 ////////////////////////////////////////
 // Expressions
 
@@ -119,6 +131,8 @@ AddExpression(1, ef_return_number, "Something Else", "My category", "OtherExpres
 AddNumberParam('first param:', "chipl notice")
 AddNumberParam('second param:', "chipl notice")
 AddExpression(1, ef_return_number, "Something special", "My category", "SpecialExpression", "Return other.");
+
+
 
 ACESDone();
 

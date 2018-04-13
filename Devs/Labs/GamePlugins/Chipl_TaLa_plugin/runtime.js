@@ -4,22 +4,27 @@
 assert2(cr, "cr namespace not created");
 assert2(cr.plugins_, "cr.plugins_ not created");
 /// Global objects and function 
-var userHandler = {}
-userHandler.setUserInfo = function (user){
-	userHandler.userInfo = user;
+var GameHandler = {}
+GameHandler.setUserInfo = function (user){
+	GameHandler.userInfo = user;
 }
 
+GameHandler.playerInfos = [];
+
 //  Test region
- var user = {
-	name: 'chipl',
+var user = {
+	msgEvent: "JOIN_OR_CREATE_ROOM_CLIENT_to_SERVER",
+	playerName: 'chipl_2',
 	avatarUrl: "something.png",
-	jwt: "aabbcccderfd",
+	playerJwt: "aabbcccderfd",
 	game: "Tala",
-	roomId: 1,
-	roomName: "Meocon"
+	playerRoomId: 1,
+	playerRoomName: "Meocon"
 };
 
-userHandler.setUserInfo(user);
+
+
+GameHandler.setUserInfo(user);
 
 /////////////////////////////////////
 // Plugin class
@@ -75,7 +80,7 @@ cr.plugins_.GameTaLaPlugin = function(runtime)
 		// e.g...
 		// this.myValue = 0;		
 		// Chipl Code Start here
-		this.userInfo = userHandler.userInfo;
+		this.userInfo = GameHandler.userInfo;
 		// console.log('userInfo:', this.userInfo)
 		// Chipl Code End here
 	};
@@ -203,6 +208,21 @@ cr.plugins_.GameTaLaPlugin = function(runtime)
 		return isSupported;
 	};	
 
+	Cnds.prototype.NewPlayerJoin = function ()
+	{
+		return true;
+	};	
+
+	//PlayerLeft
+	Cnds.prototype.PlayerLeft = function ()
+	{
+		return true;
+	};	
+
+	// CheckPlayer
+	Cnds.prototype.CheckPlayer = function (index){
+		return GameHandler.playerInfos.find(x=>x.post == index);
+	}
 
 
 	pluginProto.cnds = new Cnds();
@@ -250,7 +270,23 @@ cr.plugins_.GameTaLaPlugin = function(runtime)
                 //console.log(dataObject);
                 // console.log("Event: ",e);
                 console.log(e.data);
-                // ws.send(" I am here.. available");
+				// ws.send(" I am here.. available");
+				var player = JSON.parse(e.data);
+				var serverEventType = player.msgEvent;
+				switch(serverEventType){
+					case "JOIN_OR_CREATE_ROOM_SERVER_to_CLIENT":
+						if (GameHandler.playerInfos.indexOf((player) != -1)){
+							GameHandler.playerInfos.push(player);
+						}
+						self.runtime.trigger(cr.plugins_.GameTaLaPlugin.prototype.cnds.NewPlayerJoin,self);
+						break;
+					case "PLAYER_LEFT_ROOM_SERVER_to_CLIENT":
+						GameHandler.playerInfos = GameHandler.playerInfos.filter(item=>{
+							return item != player;
+						})
+						self.runtime.trigger(cr.plugins_.GameTaLaPlugin.prototype.cnds.PlayerLeft,self);
+						break;
+				}
         }
 
 	}
@@ -268,6 +304,7 @@ cr.plugins_.GameTaLaPlugin = function(runtime)
 		}			
 		this.ws.send(msg_);
 	};
+	
 	
 	// ... other actions here ...
 	
