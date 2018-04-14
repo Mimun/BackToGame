@@ -12,7 +12,6 @@ namespace GameFoundation
 {
 	class StartPoint
 	{
-
 		static void Main(string[] args)
 		{
 			var WebSocketClientManager = new Dictionary<IWebSocketConnection, Player>();
@@ -20,7 +19,7 @@ namespace GameFoundation
 			IWebSocketServer gameServer = new WebSocketServer("ws://0.0.0.0:8765");
 
 			gameServer.Start(socket =>
-			{
+			{				
 				socket.OnOpen = () =>
 				{
 					Console.WriteLine("Open!");
@@ -60,15 +59,13 @@ namespace GameFoundation
 								Console.WriteLine("WebsocketManager count: {0} Room {1}", WebSocketClientManager.Count , player.playerRoom.ID);
 							}
 						}
-						//
-						//
+						//						
 					}
 					catch (Exception ext)
 					{
 						Console.WriteLine(ext.ToString());
 					}
-				};
-				
+				};			
 				
 			});
 
