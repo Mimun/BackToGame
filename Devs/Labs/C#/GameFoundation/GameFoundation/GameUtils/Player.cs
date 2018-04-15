@@ -97,7 +97,7 @@ namespace GameFoundation.GameUtils
 			expando.playerName = pl.playerName;
 			//expando.playerRoomId = pl.playerRoomId;
 			//expando.playerRoomName = pl.playerRoomName;
-			//expando.playerUID = pl.playerUID;
+			expando.playerUID = pl.playerUID;
 			expando.playerBalance = pl.playerBalance;
 			expando.postInGame = pl.pos_in_room;
 			expando.post = Utils.Calculate_DislayPost(this,pl);
