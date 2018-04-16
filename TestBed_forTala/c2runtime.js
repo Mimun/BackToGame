@@ -16423,6 +16423,28 @@ cr.plugins_.GameTaLaPlugin = function(runtime)
 		}
 		ret.set_string(result);
 	}
+	Exps.prototype.GetPlayerAvatar = (ret, index)=>{
+		var result = "";
+		for (var i = 0; i<GameHandler.playerInfos.length; i++){
+			if (GameHandler.playerInfos[i].post == index){
+				result = GameHandler.playerInfos[i].avatarUrl;
+				console.log("Result form GetPlayerName: ", result);
+				break;
+			}
+		}
+		ret.set_string(result);
+	}
+	Exps.prototype.GetPlayerBalance = (ret, index)=>{
+		var result = "";
+		for (var i = 0; i<GameHandler.playerInfos.length; i++){
+			if (GameHandler.playerInfos[i].post == index){
+				result = GameHandler.playerInfos[i].balance;
+				console.log("Result form GetPlayerName: ", result);
+				break;
+			}
+		}
+		ret.set_string(result);
+	}
 	pluginProto.exps = new Exps();
 }());
 ;
@@ -18508,14 +18530,15 @@ cr.getObjectRefTable = function () { return [
 	cr.plugins_.Browser,
 	cr.plugins_.GameTaLaPlugin,
 	cr.plugins_.Function,
-	cr.plugins_.TiledBg,
-	cr.plugins_.Sprite,
 	cr.plugins_.Text,
+	cr.plugins_.Sprite,
+	cr.plugins_.TiledBg,
 	cr.plugins_.Function.prototype.cnds.OnFunction,
 	cr.system_object.prototype.cnds.ForEach,
 	cr.plugins_.Sprite.prototype.cnds.CompareInstanceVar,
 	cr.plugins_.Function.prototype.exps.Param,
 	cr.plugins_.Sprite.prototype.acts.SetVisible,
+	cr.plugins_.Sprite.prototype.acts.LoadURL,
 	cr.plugins_.Text.prototype.cnds.CompareInstanceVar,
 	cr.plugins_.Text.prototype.acts.SetText,
 	cr.plugins_.Text.prototype.acts.SetVisible,
@@ -18528,6 +18551,7 @@ cr.getObjectRefTable = function () { return [
 	cr.system_object.prototype.exps.loopindex,
 	cr.system_object.prototype.acts.SetVar,
 	cr.plugins_.GameTaLaPlugin.prototype.exps.GetPlayerName,
+	cr.plugins_.GameTaLaPlugin.prototype.exps.GetPlayerAvatar,
 	cr.plugins_.Function.prototype.acts.CallFunction,
 	cr.plugins_.GameTaLaPlugin.prototype.cnds.PlayerLeft
 ];};
