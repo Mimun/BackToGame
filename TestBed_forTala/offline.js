@@ -1,5 +1,5 @@
 ﻿{
-	"version": 1523878395,
+	"version": 1523889583,
 	"fileList": [
 		"data.js",
 		"c2runtime.js",
@@ -7,7 +7,7 @@
 		"offlineClient.js",
 		"images/background.png",
 		"images/talalayout-sheet0.png",
-		"images/player-sheet0.png",
+		"images/p3-sheet0.png",
 		"icon-16.png",
 		"icon-32.png",
 		"icon-114.png",
