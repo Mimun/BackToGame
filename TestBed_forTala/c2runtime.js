@@ -16362,7 +16362,6 @@ cr.plugins_.GameTaLaPlugin = function(runtime)
             self.runtime.trigger(cr.plugins_.GameTaLaPlugin.prototype.cnds.OnClosed,self);
         }
         this.ws.onmessage = function (e) {
-                console.log(e.data);
 				var player = JSON.parse(e.data);
 				var serverEventType = player.msgEvent;
 				switch(serverEventType){
@@ -16371,18 +16370,20 @@ cr.plugins_.GameTaLaPlugin = function(runtime)
 						for (var i = 0; i< GameHandler.playerInfos.length; i++){
 							if (GameHandler.playerInfos[i].playerUID == player.playerUID){
 								found = true;
-								break;
+								GameHandler.playerInfos[i]=player;
 							}
 						}
 						if (!found){
 							GameHandler.playerInfos.push(player);
 							self.runtime.trigger(cr.plugins_.GameTaLaPlugin.prototype.cnds.NewPlayerJoin,self);
 						}
+						console.log("JOIN_OR_CREATE_ROOM_SERVER_to_CLIENT", "post:", player.post, player);
 						break;
 					case "PLAYER_LEFT_ROOM_SERVER_to_CLIENT":
 						GameHandler.playerInfos = GameHandler.playerInfos.filter(item=>{
 							return item.playerUID != player.playerUID;
 						})
+						GameHandler.leftPlayer = player;
 						self.runtime.trigger(cr.plugins_.GameTaLaPlugin.prototype.cnds.PlayerLeft,self);
 						break;
 				}
@@ -16444,6 +16445,9 @@ cr.plugins_.GameTaLaPlugin = function(runtime)
 			}
 		}
 		ret.set_string(result);
+	}
+	Exps.prototype.GetLeftPlayerPos = (ret)=>{
+		ret.set_int(GameHandler.leftPlayer.post);
 	}
 	pluginProto.exps = new Exps();
 }());
@@ -18530,21 +18534,21 @@ cr.getObjectRefTable = function () { return [
 	cr.plugins_.Browser,
 	cr.plugins_.GameTaLaPlugin,
 	cr.plugins_.Function,
-	cr.plugins_.Text,
 	cr.plugins_.TiledBg,
+	cr.plugins_.Text,
 	cr.plugins_.Sprite,
 	cr.plugins_.Function.prototype.cnds.OnFunction,
-	cr.system_object.prototype.cnds.ForEach,
 	cr.plugins_.Sprite.prototype.cnds.CompareInstanceVar,
 	cr.plugins_.Function.prototype.exps.Param,
-	cr.plugins_.Sprite.prototype.acts.SetVisible,
 	cr.plugins_.Sprite.prototype.acts.LoadURL,
+	cr.plugins_.Sprite.prototype.acts.SetVisible,
 	cr.plugins_.Text.prototype.cnds.CompareInstanceVar,
 	cr.plugins_.Text.prototype.acts.SetText,
 	cr.plugins_.Text.prototype.acts.SetVisible,
 	cr.system_object.prototype.exps.str,
 	cr.system_object.prototype.cnds.OnLayoutStart,
 	cr.plugins_.GameTaLaPlugin.prototype.acts.Connect,
+	cr.plugins_.Sprite.prototype.cnds.OnURLLoaded,
 	cr.plugins_.GameTaLaPlugin.prototype.cnds.NewPlayerJoin,
 	cr.system_object.prototype.cnds.For,
 	cr.plugins_.GameTaLaPlugin.prototype.cnds.CheckPlayer,
@@ -18553,6 +18557,7 @@ cr.getObjectRefTable = function () { return [
 	cr.plugins_.GameTaLaPlugin.prototype.exps.GetPlayerName,
 	cr.plugins_.GameTaLaPlugin.prototype.exps.GetPlayerAvatar,
 	cr.plugins_.Function.prototype.acts.CallFunction,
-	cr.plugins_.GameTaLaPlugin.prototype.cnds.PlayerLeft
+	cr.plugins_.GameTaLaPlugin.prototype.cnds.PlayerLeft,
+	cr.plugins_.GameTaLaPlugin.prototype.exps.GetLeftPlayerPos
 ];};
 

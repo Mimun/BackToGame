@@ -24,14 +24,17 @@ namespace GameFoundation.GameUtils
 			}
 			Players.Add(pl);
 			//(position in game to calculate respective postion in display of each player)
+			// check and prepair again
 			#region Assign position for player 
 			int post = 0;			
 			Players.ForEach(p => {
 				if (p.pos_in_room == -1 || p.pos_in_room != post) {					
-					p.pos_in_room = post;
-					this.Broadcast(p, StaticEvent.JOIN_OR_CREATE_ROOM_SERVER_to_CLIENT);
-				}
+					p.pos_in_room = post;					
+				}				
 				post++;
+			});
+			Players.ForEach(p => {
+				this.Broadcast(p, StaticEvent.JOIN_OR_CREATE_ROOM_SERVER_to_CLIENT);
 			});
 			#endregion
 			
