@@ -52,6 +52,33 @@ namespace GameFoundation.GameUtils
 			
 			return pl;
 		}
+
+		public static List<int> CardShuffle()
+		{
+			// using https://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle
+			Random _random = new Random();
+
+			int[] array = new int[52];
+			for (var i = 0; i < 52; i++)
+			{
+				array[i] = i;
+			}
+
+			int n = array.Length;
+			for (int i = 0; i < n; i++)
+			{
+				// Use Next on random instance with an argument.
+				// ... The argument is an exclusive bound.
+				//     So we will not go past the end of the array.
+				int r = i + _random.Next(n - i);
+				int t = array[r];
+				array[r] = array[i];
+				array[i] = t;
+			}
+
+			return array.ToList();
+		}
+
 		public static Player FindLastWinner(List<Player> players)
 		{
 			
@@ -63,7 +90,7 @@ namespace GameFoundation.GameUtils
 
 			lastWinner = (from p in players where p.isWinner == true select p).FirstOrDefault();
 			if (lastWinner != null)
-			{
+			{				
 				return lastWinner;
 			}
 			// other case, find min score of player in room - for the case the winner left room
@@ -73,7 +100,7 @@ namespace GameFoundation.GameUtils
 			{
 				int minPost = players.Min(p => p.pos_in_room);
 				lastWinner = players.Find(p => { return p.pos_in_room == minPost; });
-
+				lastWinner.isWinner = true;
 			}
 			return lastWinner;
 		}

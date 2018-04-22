@@ -16416,7 +16416,13 @@ cr.plugins_.GameTaLaPlugin = function(runtime)
 						self.runtime.trigger(cr.plugins_.GameTaLaPlugin.prototype.cnds.PlayerLeft,self);
 						break;
 					case "TAKE_START_BUTTON_SERVER_to_CLIENT":
+					GameHandler.userInfo.Cards = player.value;
 						self.runtime.trigger(cr.plugins_.GameTaLaPlugin.prototype.cnds.DisplayStartButton,self);
+						break;
+					case "START_NEW_GAME_SERVER_to_CLIENT":
+					console.log("START_NEW_GAME_SERVER_to_CLIENT");
+					console.log(player);
+					self.runtime.trigger(cr.plugins_.GameTaLaPlugin.prototype.cnds.DealCard,self);
 						break;
 				}
         }
@@ -20507,9 +20513,9 @@ cr.getObjectRefTable = function () { return [
 	cr.plugins_.Browser,
 	cr.plugins_.GameTaLaPlugin,
 	cr.plugins_.Function,
-	cr.plugins_.Sprite,
 	cr.plugins_.Text,
 	cr.plugins_.TiledBg,
+	cr.plugins_.Sprite,
 	cr.plugins_.Touch,
 	cr.behaviors.Rex_MoveTo,
 	cr.behaviors.DragnDrop,
@@ -20537,6 +20543,8 @@ cr.getObjectRefTable = function () { return [
 	cr.plugins_.GameTaLaPlugin.prototype.exps.GetLeftPlayerPos,
 	cr.plugins_.GameTaLaPlugin.prototype.cnds.DisplayStartButton,
 	cr.plugins_.Touch.prototype.cnds.OnTouchObject,
-	cr.plugins_.GameTaLaPlugin.prototype.acts.SendStartGame
+	cr.plugins_.GameTaLaPlugin.prototype.acts.SendStartGame,
+	cr.plugins_.GameTaLaPlugin.prototype.cnds.DealCard,
+	cr.plugins_.GameTaLaPlugin.prototype.acts.MyAction
 ];};
 

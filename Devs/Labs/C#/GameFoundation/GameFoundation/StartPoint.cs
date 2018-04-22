@@ -67,6 +67,7 @@ namespace GameFoundation
 							WebSocketClientManager.TryGetValue(socket, out player);
 							Room room = player.playerRoom;
 							Console.WriteLine("In room {0} and player {1}", room.Name, player.playerName);
+							room.StartGame();
 
 						}
 						//						

@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Collections.Generic;
 using System.Text;
+using Newtonsoft.Json;
 
 namespace GameFoundation.GameUtils
 {
@@ -74,9 +75,34 @@ namespace GameFoundation.GameUtils
 		}
 		// Send start game signal to all of players
 		public void StartGame() {
+			List<int> shuffleCards = StaticEvent.CardShuffle();
+
+			
+
+			//1. Distribute cards to each player in room. Only one have winner flag
+			Player winner = (from Player p in Players where p.isWinner == true select p).FirstOrDefault();
+			winner.Cards.Add(shuffleCards[0]);
+			shuffleCards.Remove(shuffleCards[0]);
+
+			for (var i = 0; i< 8; i++)
+			{
+				Players.ForEach(p => {
+					p.Cards.Add(shuffleCards[0]);
+					shuffleCards.Remove(shuffleCards[0]);
+				});
+			}
+
+			#region check
+			// using for check during development
+			string json = JsonConvert.SerializeObject(shuffleCards);
+			Console.WriteLine("Remain Cards {0} and total count {1}",json, shuffleCards.Count);
+			json = string.Join(",", winner.Cards.ToArray());
+			Console.WriteLine("Card on Winner: {0}", json);
+			#endregion
+
 			Players.ForEach(p =>
 			{
-				p.Send(p, StaticEvent.START_NEW_GAME_SERVER_to_CLIENT);
+				p.Send(p, StaticEvent.START_NEW_GAME_SERVER_to_CLIENT, json = string.Join(",", p.Cards.ToArray()));
 			});
 		}
 			
