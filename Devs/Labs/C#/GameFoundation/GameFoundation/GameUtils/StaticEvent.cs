@@ -12,6 +12,9 @@ namespace GameFoundation.GameUtils
 		public static string JOIN_OR_CREATE_ROOM_CLIENT_to_SERVER = "JOIN_OR_CREATE_ROOM_CLIENT_to_SERVER";
 		public static string PLAYER_LEFT_ROOM_SERVER_to_CLIENT = "PLAYER_LEFT_ROOM_SERVER_to_CLIENT";
 
+		public static string TAKE_START_BUTTON_SERVER_to_CLIENT = "TAKE_START_BUTTON_SERVER_to_CLIENT";
+		public static string START_NEW_GAME_CLIENT_to_SERVER = "START_NEW_GAME_CLIENT_to_SERVER";
+		public static string START_NEW_GAME_SERVER_to_CLIENT = "START_NEW_GAME_SERVER_to_CLIENT";
 
 		public static List<Room> roomList = new List<Room>();
 
@@ -48,6 +51,31 @@ namespace GameFoundation.GameUtils
 			#endregion
 			
 			return pl;
+		}
+		public static Player FindLastWinner(List<Player> players)
+		{
+			
+			Player lastWinner = null;
+			if (players.Count == 0)
+			{
+				return lastWinner ;
+			}
+
+			lastWinner = (from p in players where p.isWinner == true select p).FirstOrDefault();
+			if (lastWinner != null)
+			{
+				return lastWinner;
+			}
+			// other case, find min score of player in room - for the case the winner left room
+			//...
+			// other case, take a first player join in room
+			if (lastWinner == null)
+			{
+				int minPost = players.Min(p => p.pos_in_room);
+				lastWinner = players.Find(p => { return p.pos_in_room == minPost; });
+
+			}
+			return lastWinner;
 		}
 	}
 }

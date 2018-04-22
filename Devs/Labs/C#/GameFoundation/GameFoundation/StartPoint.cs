@@ -59,6 +59,16 @@ namespace GameFoundation
 								Console.WriteLine("WebsocketManager count: {0} Room {1}", WebSocketClientManager.Count , player.playerRoom.ID);
 							}
 						}
+						if (expando.msgEvent == StaticEvent.START_NEW_GAME_CLIENT_to_SERVER)
+						{
+							Console.WriteLine("Iam here..");
+							// Get player, room from socket
+							Player player;
+							WebSocketClientManager.TryGetValue(socket, out player);
+							Room room = player.playerRoom;
+							Console.WriteLine("In room {0} and player {1}", room.Name, player.playerName);
+
+						}
 						//						
 					}
 					catch (Exception ext)

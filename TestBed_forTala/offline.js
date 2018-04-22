@@ -1,5 +1,5 @@
 ﻿{
-	"version": 1524162764,
+	"version": 1524384916,
 	"fileList": [
 		"data.js",
 		"c2runtime.js",
@@ -8,6 +8,10 @@
 		"images/background.png",
 		"images/talalayout-sheet0.png",
 		"images/p3-sheet0.png",
+		"images/startbnt-sheet0.png",
+		"images/card-sheet0.png",
+		"images/card-sheet1.png",
+		"images/backcard-sheet0.png",
 		"icon-16.png",
 		"icon-32.png",
 		"icon-114.png",

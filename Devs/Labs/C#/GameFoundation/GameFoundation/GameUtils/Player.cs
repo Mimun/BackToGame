@@ -20,6 +20,10 @@ namespace GameFoundation.GameUtils
 		public string avatarUrl;
 		public Room playerRoom;
 		public int pos_in_room = -1 ;
+		public bool isWinner = false;
+		public int lastScore = 0;
+		//
+		public List<int> Cards = new List<int>();
 
 		private List<IWebSocketConnection> playerWebsocketList = new List<IWebSocketConnection>();
 
