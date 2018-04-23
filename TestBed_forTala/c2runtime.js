@@ -16369,7 +16369,7 @@ cr.plugins_.GameTaLaPlugin = function(runtime)
 	function Acts() {};
 	Acts.prototype.MyAction = function (myparam)
 	{
-		alert(myparam);
+		console.log(myparam);
 	};
 	Acts.prototype.Connect = function (ws_url, protocol){
 		if (this.ws){
@@ -16409,20 +16409,20 @@ cr.plugins_.GameTaLaPlugin = function(runtime)
 						console.log("JOIN_OR_CREATE_ROOM_SERVER_to_CLIENT", "post:", player.post, player);
 						break;
 					case "PLAYER_LEFT_ROOM_SERVER_to_CLIENT":
-						GameHandler.playerInfos = GameHandler.playerInfos.filter(item=>{
-							return item.playerUID != player.playerUID;
-						})
-						GameHandler.leftPlayer = player;
-						self.runtime.trigger(cr.plugins_.GameTaLaPlugin.prototype.cnds.PlayerLeft,self);
+							GameHandler.playerInfos = GameHandler.playerInfos.filter(item=>{
+								return item.playerUID != player.playerUID;
+							})
+							GameHandler.leftPlayer = player;
+							self.runtime.trigger(cr.plugins_.GameTaLaPlugin.prototype.cnds.PlayerLeft,self);
 						break;
 					case "TAKE_START_BUTTON_SERVER_to_CLIENT":
-					GameHandler.userInfo.Cards = player.value;
-						self.runtime.trigger(cr.plugins_.GameTaLaPlugin.prototype.cnds.DisplayStartButton,self);
+							self.runtime.trigger(cr.plugins_.GameTaLaPlugin.prototype.cnds.DisplayStartButton,self);
 						break;
 					case "START_NEW_GAME_SERVER_to_CLIENT":
-					console.log("START_NEW_GAME_SERVER_to_CLIENT");
-					console.log(player);
-					self.runtime.trigger(cr.plugins_.GameTaLaPlugin.prototype.cnds.DealCard,self);
+							GameHandler.userInfo.Cards = player.value;
+							console.log("START_NEW_GAME_SERVER_to_CLIENT");
+							console.log(player.value);
+							self.runtime.trigger(cr.plugins_.GameTaLaPlugin.prototype.cnds.DealCard,self);
 						break;
 				}
         }
@@ -16495,6 +16495,9 @@ cr.plugins_.GameTaLaPlugin = function(runtime)
 	}
 	Exps.prototype.GetLeftPlayerPos = (ret)=>{
 		ret.set_int(GameHandler.leftPlayer.post);
+	}
+	Exps.prototype.GetCards = (ret)=>{
+		ret.set_string(GameHandler.userInfo.Cards);
 	}
 	pluginProto.exps = new Exps();
 }());
@@ -20513,10 +20516,10 @@ cr.getObjectRefTable = function () { return [
 	cr.plugins_.Browser,
 	cr.plugins_.GameTaLaPlugin,
 	cr.plugins_.Function,
-	cr.plugins_.Text,
 	cr.plugins_.TiledBg,
-	cr.plugins_.Sprite,
 	cr.plugins_.Touch,
+	cr.plugins_.Text,
+	cr.plugins_.Sprite,
 	cr.behaviors.Rex_MoveTo,
 	cr.behaviors.DragnDrop,
 	cr.plugins_.Function.prototype.cnds.OnFunction,
@@ -20545,6 +20548,28 @@ cr.getObjectRefTable = function () { return [
 	cr.plugins_.Touch.prototype.cnds.OnTouchObject,
 	cr.plugins_.GameTaLaPlugin.prototype.acts.SendStartGame,
 	cr.plugins_.GameTaLaPlugin.prototype.cnds.DealCard,
-	cr.plugins_.GameTaLaPlugin.prototype.acts.MyAction
+	cr.plugins_.GameTaLaPlugin.prototype.exps.GetCards,
+	cr.system_object.prototype.exps["int"],
+	cr.system_object.prototype.exps.tokencount,
+	cr.plugins_.Sprite.prototype.acts.Destroy,
+	cr.plugins_.Sprite.prototype.acts.Spawn,
+	cr.system_object.prototype.exps.tokenat,
+	cr.plugins_.Sprite.prototype.acts.SetAnimFrame,
+	cr.plugins_.Sprite.prototype.acts.SetInstanceVar,
+	cr.behaviors.Rex_MoveTo.prototype.acts.SetTargetPos,
+	cr.plugins_.Touch.prototype.cnds.OnTapGestureObject,
+	cr.behaviors.Rex_MoveTo.prototype.cnds.CompareSpeed,
+	cr.plugins_.Sprite.prototype.cnds.PickTopBottom,
+	cr.system_object.prototype.cnds.Else,
+	cr.plugins_.Sprite.prototype.acts.SetY,
+	cr.behaviors.DragnDrop.prototype.cnds.OnDrop,
+	cr.system_object.prototype.acts.SetGroupActive,
+	cr.system_object.prototype.cnds.IsGroupActive,
+	cr.system_object.prototype.cnds.ForEachOrdered,
+	cr.plugins_.Sprite.prototype.exps.X,
+	cr.plugins_.Sprite.prototype.acts.MoveToTop,
+	cr.plugins_.Sprite.prototype.acts.SetX,
+	cr.plugins_.GameTaLaPlugin.prototype.acts.MyAction,
+	cr.system_object.prototype.cnds.ForEach
 ];};
 
