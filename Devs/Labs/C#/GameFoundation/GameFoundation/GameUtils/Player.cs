@@ -19,11 +19,34 @@ namespace GameFoundation.GameUtils
 		public string playerRoomId;
 		public string avatarUrl;
 		public Room playerRoom;
-		public int pos_in_room = -1 ;
+		public int pos_in_room = -1;
 		public bool isWinner = false;
 		public int lastScore = 0;
 		//
 		public List<int> Cards = new List<int>();
+		public enum Stage
+		{
+			Idle, Considering, Placing, ShowCards
+		}
+
+		Stage _stage = Stage.Idle;
+	
+		public Stage Status
+		{
+			get
+			{
+				return this._stage;
+			}
+			set
+			{
+
+				_stage = value;
+				// send this status to client;
+				this.Send(this,StaticEvent.CHANGE_PLAYER_STATGE_SERVER_to_CLIENT, this._stage.ToString().ToUpper());
+				Console.WriteLine("from change _stage: {0}  , {1}", this.playerName, Status);				
+
+			}
+		}
 
 		private List<IWebSocketConnection> playerWebsocketList = new List<IWebSocketConnection>();
 

@@ -16,6 +16,20 @@ namespace GameFoundation.GameUtils
 		public static string START_NEW_GAME_CLIENT_to_SERVER = "START_NEW_GAME_CLIENT_to_SERVER";
 		public static string START_NEW_GAME_SERVER_to_CLIENT = "START_NEW_GAME_SERVER_to_CLIENT";
 
+
+		public static string CHANGE_PLAYER_STATGE_SERVER_to_CLIENT = "CHANGE_PLAYER_STATGE_SERVER_to_CLIENT";
+
+		public static string PLACING_CARD_CLIENT_to_SERVER = "PLACING_CARD_CLIENT_to_SERVER";
+		public static string PLACING_CARD_SERVER_to_CLIENT = "PLACING_CARD_SERVER_to_CLIENT";
+
+		public static string TAKE_CARD_FROM_DESK_CLIENT_to_SERVER = "TAKE_CARD_FROM_DESK_CLIENT_to_SERVER";
+		public static string TAKE_CARD_FROM_DESK_SERVER_to_CLIENT = "TAKE_CARD_FROM_DESK_SERVER_to_CLIENT";
+
+		public static string TAKE_CARD_FROM_OTHER_CLIENT_to_SERVER = "TAKE_CARD_FROM_OTHER_CLIENT_to_SERVER";
+		public static string TAKE_CARD_FROM_OTHER_SERVER_to_CLIENT = "TAKE_CARD_FROM_OTHER_SERVER_to_CLIENT";
+
+
+
 		public static List<Room> roomList = new List<Room>();
 
 		public static Player CreateOrJoin_Handler(Player pl, IWebSocketConnection socket)
@@ -49,7 +63,7 @@ namespace GameFoundation.GameUtils
 				pl.playerRoom = room;
 			}
 			#endregion
-			
+
 			return pl;
 		}
 
@@ -81,16 +95,16 @@ namespace GameFoundation.GameUtils
 
 		public static Player FindLastWinner(List<Player> players)
 		{
-			
+
 			Player lastWinner = null;
 			if (players.Count == 0)
 			{
-				return lastWinner ;
+				return lastWinner;
 			}
 
 			lastWinner = (from p in players where p.isWinner == true select p).FirstOrDefault();
 			if (lastWinner != null)
-			{				
+			{
 				return lastWinner;
 			}
 			// other case, find min score of player in room - for the case the winner left room
@@ -103,6 +117,31 @@ namespace GameFoundation.GameUtils
 				lastWinner.isWinner = true;
 			}
 			return lastWinner;
+		}
+
+		public static Player FindNextPlayer(Player pl,List<Player> players)
+		{
+			Player nextPlayer = null;			
+			if (pl.pos_in_room == players.Max(p => p.pos_in_room))
+			{
+				nextPlayer = players[players.Min(p => p.pos_in_room)];
+			}
+			else
+			{
+				int i = 1;
+				do
+				{
+					if (players[pl.pos_in_room + i] != null)
+					{
+						nextPlayer = players[pl.pos_in_room + i];
+						break;
+					}
+					i++;
+				} while (nextPlayer != null);
+			}
+
+
+			return nextPlayer;
 		}
 	}
 }

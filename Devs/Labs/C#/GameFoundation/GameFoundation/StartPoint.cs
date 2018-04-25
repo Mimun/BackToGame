@@ -65,10 +65,19 @@ namespace GameFoundation
 							// Get player, room from socket
 							Player player;
 							WebSocketClientManager.TryGetValue(socket, out player);
-							Room room = player.playerRoom;
+							Room room = player.playerRoom;						
+
 							Console.WriteLine("In room {0} and player {1}", room.Name, player.playerName);
 							room.StartGame();
 
+						}
+						if (expando.msgEvent == StaticEvent.PLACING_CARD_CLIENT_to_SERVER)
+						{
+							Player player;
+							WebSocketClientManager.TryGetValue(socket, out player);
+							Room room = player.playerRoom;
+							Console.WriteLine("Player {0} placing card {1}", player.playerName, expando.cardVal);
+							room.PlacingCard(player, (int)expando.cardVal);
 						}
 						//						
 					}

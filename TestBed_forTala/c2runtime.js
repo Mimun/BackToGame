@@ -16365,6 +16365,12 @@ cr.plugins_.GameTaLaPlugin = function(runtime)
 	Cnds.prototype.DisplayStartButton = function (){
 		return true;
 	}
+	Cnds.prototype.UserStatusChange = function (){
+		return true;
+	}
+	Cnds.prototype.PlayerPlacingCard = function (){
+		return true;
+	}
 	pluginProto.cnds = new Cnds();
 	function Acts() {};
 	Acts.prototype.MyAction = function (myparam)
@@ -16424,6 +16430,14 @@ cr.plugins_.GameTaLaPlugin = function(runtime)
 							console.log(player.value);
 							self.runtime.trigger(cr.plugins_.GameTaLaPlugin.prototype.cnds.DealCard,self);
 						break;
+					case "CHANGE_PLAYER_STATGE_SERVER_to_CLIENT":
+							GameHandler.userInfo.Stage = player.value;
+							self.runtime.trigger(cr.plugins_.GameTaLaPlugin.prototype.cnds.UserStatusChange,self);
+						break;
+					case "PLACING_CARD_SERVER_to_CLIENT":
+							GameHandler.lastPlacedPlayer = player;
+							self.runtime.trigger(cr.plugins_.GameTaLaPlugin.prototype.cnds.PlayerPlacingCard,self);
+						break;
 				}
         }
 	}
@@ -16446,6 +16460,16 @@ cr.plugins_.GameTaLaPlugin = function(runtime)
 		}
 		msg = "START_NEW_GAME_CLIENT_to_SERVER";
 		sendObj = {msgEvent: msg}
+		this.ws.send(JSON.stringify(sendObj));
+	};
+	Acts.prototype.PlacingCard = function (cardVal)
+	{
+		if (!this.ws || this.ws.readyState !== 1 /* OPEN */){
+			return;
+		}
+		msg = "PLACING_CARD_CLIENT_to_SERVER";
+		sendObj = {	msgEvent: msg,
+					cardVal: cardVal}
 		this.ws.send(JSON.stringify(sendObj));
 	};
 	pluginProto.acts = new Acts();
@@ -16498,6 +16522,17 @@ cr.plugins_.GameTaLaPlugin = function(runtime)
 	}
 	Exps.prototype.GetCards = (ret)=>{
 		ret.set_string(GameHandler.userInfo.Cards);
+	}
+	Exps.prototype.GetUserStatus = (ret)=>{
+		ret.set_string(GameHandler.userInfo.Stage);
+	}
+	Exps.prototype.GetPlacedCardInfo = (ret, type)=>{
+		if (type == 0){
+			ret.set_int(GameHandler.lastPlacedPlayer.post);
+		}
+		if (type == 1){
+			ret.set_int(GameHandler.lastPlacedPlayer.value);
+		}
 	}
 	pluginProto.exps = new Exps();
 }());
@@ -20516,10 +20551,10 @@ cr.getObjectRefTable = function () { return [
 	cr.plugins_.Browser,
 	cr.plugins_.GameTaLaPlugin,
 	cr.plugins_.Function,
-	cr.plugins_.TiledBg,
 	cr.plugins_.Touch,
-	cr.plugins_.Text,
 	cr.plugins_.Sprite,
+	cr.plugins_.Text,
+	cr.plugins_.TiledBg,
 	cr.behaviors.Rex_MoveTo,
 	cr.behaviors.DragnDrop,
 	cr.plugins_.Function.prototype.cnds.OnFunction,
@@ -20557,6 +20592,10 @@ cr.getObjectRefTable = function () { return [
 	cr.plugins_.Sprite.prototype.acts.SetAnimFrame,
 	cr.plugins_.Sprite.prototype.acts.SetInstanceVar,
 	cr.behaviors.Rex_MoveTo.prototype.acts.SetTargetPos,
+	cr.plugins_.Sprite.prototype.acts.RotateClockwise,
+	cr.plugins_.Sprite.prototype.acts.SetEffectEnabled,
+	cr.plugins_.GameTaLaPlugin.prototype.acts.MyAction,
+	cr.plugins_.Sprite.prototype.acts.SetOpacity,
 	cr.plugins_.Touch.prototype.cnds.OnTapGestureObject,
 	cr.behaviors.Rex_MoveTo.prototype.cnds.CompareSpeed,
 	cr.plugins_.Sprite.prototype.cnds.PickTopBottom,
@@ -20569,7 +20608,13 @@ cr.getObjectRefTable = function () { return [
 	cr.plugins_.Sprite.prototype.exps.X,
 	cr.plugins_.Sprite.prototype.acts.MoveToTop,
 	cr.plugins_.Sprite.prototype.acts.SetX,
-	cr.plugins_.GameTaLaPlugin.prototype.acts.MyAction,
-	cr.system_object.prototype.cnds.ForEach
+	cr.system_object.prototype.cnds.ForEach,
+	cr.plugins_.GameTaLaPlugin.prototype.cnds.UserStatusChange,
+	cr.plugins_.GameTaLaPlugin.prototype.exps.GetUserStatus,
+	cr.system_object.prototype.cnds.CompareVar,
+	cr.plugins_.GameTaLaPlugin.prototype.acts.PlacingCard,
+	cr.plugins_.GameTaLaPlugin.prototype.cnds.PlayerPlacingCard,
+	cr.plugins_.GameTaLaPlugin.prototype.exps.GetPlacedCardInfo,
+	cr.plugins_.Sprite.prototype.exps.Y
 ];};
 
