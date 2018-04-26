@@ -16371,6 +16371,9 @@ cr.plugins_.GameTaLaPlugin = function(runtime)
 	Cnds.prototype.PlayerPlacingCard = function (){
 		return true;
 	}
+	Cnds.prototype.NewCardFromDesk = function (){
+		return true;
+	}
 	pluginProto.cnds = new Cnds();
 	function Acts() {};
 	Acts.prototype.MyAction = function (myparam)
@@ -16438,6 +16441,10 @@ cr.plugins_.GameTaLaPlugin = function(runtime)
 							GameHandler.lastPlacedPlayer = player;
 							self.runtime.trigger(cr.plugins_.GameTaLaPlugin.prototype.cnds.PlayerPlacingCard,self);
 						break;
+					case "TAKE_CARD_FROM_DESK_SERVER_to_CLIENT":
+							GameHandler.lastPlayerTakeCardFromDesk = player;
+							self.runtime.trigger(cr.plugins_.GameTaLaPlugin.prototype.cnds.NewCardFromDesk,self);
+						break;
 				}
         }
 	}
@@ -16470,6 +16477,15 @@ cr.plugins_.GameTaLaPlugin = function(runtime)
 		msg = "PLACING_CARD_CLIENT_to_SERVER";
 		sendObj = {	msgEvent: msg,
 					cardVal: cardVal}
+		this.ws.send(JSON.stringify(sendObj));
+	};
+	Acts.prototype.TakeCardFromDesk = function ()
+	{
+		if (!this.ws || this.ws.readyState !== 1 /* OPEN */){
+			return;
+		}
+		msg = "TAKE_CARD_FROM_DESK_CLIENT_to_SERVER";
+		sendObj = {	msgEvent: msg}
 		this.ws.send(JSON.stringify(sendObj));
 	};
 	pluginProto.acts = new Acts();
@@ -16532,6 +16548,14 @@ cr.plugins_.GameTaLaPlugin = function(runtime)
 		}
 		if (type == 1){
 			ret.set_int(GameHandler.lastPlacedPlayer.value);
+		}
+	}
+	Exps.prototype.GetNewCardFromDeskInfo = (ret, type)=>{
+		if (type == 0){
+			ret.set_int(GameHandler.lastPlayerTakeCardFromDesk.post);
+		}
+		if (type == 1){
+			ret.set_int(GameHandler.lastPlayerTakeCardFromDesk.value);
 		}
 	}
 	pluginProto.exps = new Exps();
@@ -20552,9 +20576,9 @@ cr.getObjectRefTable = function () { return [
 	cr.plugins_.GameTaLaPlugin,
 	cr.plugins_.Function,
 	cr.plugins_.Touch,
-	cr.plugins_.Sprite,
-	cr.plugins_.Text,
 	cr.plugins_.TiledBg,
+	cr.plugins_.Text,
+	cr.plugins_.Sprite,
 	cr.behaviors.Rex_MoveTo,
 	cr.behaviors.DragnDrop,
 	cr.plugins_.Function.prototype.cnds.OnFunction,
@@ -20581,6 +20605,7 @@ cr.getObjectRefTable = function () { return [
 	cr.plugins_.GameTaLaPlugin.prototype.exps.GetLeftPlayerPos,
 	cr.plugins_.GameTaLaPlugin.prototype.cnds.DisplayStartButton,
 	cr.plugins_.Touch.prototype.cnds.OnTouchObject,
+	cr.plugins_.Sprite.prototype.cnds.IsVisible,
 	cr.plugins_.GameTaLaPlugin.prototype.acts.SendStartGame,
 	cr.plugins_.GameTaLaPlugin.prototype.cnds.DealCard,
 	cr.plugins_.GameTaLaPlugin.prototype.exps.GetCards,
@@ -20615,6 +20640,12 @@ cr.getObjectRefTable = function () { return [
 	cr.plugins_.GameTaLaPlugin.prototype.acts.PlacingCard,
 	cr.plugins_.GameTaLaPlugin.prototype.cnds.PlayerPlacingCard,
 	cr.plugins_.GameTaLaPlugin.prototype.exps.GetPlacedCardInfo,
-	cr.plugins_.Sprite.prototype.exps.Y
+	cr.plugins_.Sprite.prototype.exps.Y,
+	cr.plugins_.GameTaLaPlugin.prototype.acts.TakeCardFromDesk,
+	cr.plugins_.GameTaLaPlugin.prototype.cnds.NewCardFromDesk,
+	cr.plugins_.GameTaLaPlugin.prototype.exps.GetNewCardFromDeskInfo,
+	cr.behaviors.Rex_MoveTo.prototype.acts.SetTargetPosOnObject,
+	cr.plugins_.Sprite.prototype.cnds.IsOverlapping,
+	cr.behaviors.Rex_MoveTo.prototype.cnds.OnHitTarget
 ];};
 

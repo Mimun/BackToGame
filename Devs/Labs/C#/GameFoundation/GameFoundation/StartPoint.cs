@@ -71,6 +71,7 @@ namespace GameFoundation
 							room.StartGame();
 
 						}
+						//PLACING_CARD_CLIENT_to_SERVER
 						if (expando.msgEvent == StaticEvent.PLACING_CARD_CLIENT_to_SERVER)
 						{
 							Player player;
@@ -79,7 +80,15 @@ namespace GameFoundation
 							Console.WriteLine("Player {0} placing card {1}", player.playerName, expando.cardVal);
 							room.PlacingCard(player, (int)expando.cardVal);
 						}
-						//						
+						//TAKE_CARD_FROM_DESK_CLIENT_to_SERVER
+						if (expando.msgEvent == StaticEvent.TAKE_CARD_FROM_DESK_CLIENT_to_SERVER)
+						{
+							Player player;
+							WebSocketClientManager.TryGetValue(socket, out player);
+							Room room = player.playerRoom;
+							Console.WriteLine("Player {0} need a new Card", player.playerName);
+							room.TakeNewCard(player);
+						}
 					}
 					catch (Exception ext)
 					{

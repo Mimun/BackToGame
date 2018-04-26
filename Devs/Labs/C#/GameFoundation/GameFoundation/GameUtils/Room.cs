@@ -102,7 +102,7 @@ namespace GameFoundation.GameUtils
 
 			
 			// Distribute card to each other
-			for (var i = 0; i< 8; i++)
+			for (var i = 0; i< 9; i++)
 			{
 				Players.ForEach(p => {
 					p.Cards.Add(shuffleCards[0]);
@@ -124,7 +124,33 @@ namespace GameFoundation.GameUtils
 				p.Send(p, StaticEvent.START_NEW_GAME_SERVER_to_CLIENT, json = string.Join(",", p.Cards.ToArray()));
 			});
 		}
+
+		internal void TakeNewCard(Player pl)
+		{
+			// Take a new Card from Desk
+			if (pl.Status != Player.Stage.Considering) {
+				return;
+			}
+			if (RemainCards.Count <= 0)
+			{
+				return;
+			}
+			int newCard = RemainCards[0];
+			pl.Cards.Add(newCard);
+			RemainCards.Remove(newCard);
+			Console.WriteLine("Number of Remain Cards: {0}", RemainCards.Count);
 			
+
+			Players.ForEach(p =>{
+				if(p !=pl) {
+					p.Send(pl, StaticEvent.TAKE_CARD_FROM_DESK_SERVER_to_CLIENT, (-1).ToString());
+				} else {
+					p.Send(pl, StaticEvent.TAKE_CARD_FROM_DESK_SERVER_to_CLIENT, newCard.ToString());
+				}
+			});
+			pl.Status = Player.Stage.Placing;
+		}
+
 		public void PlacingCard(Player pl, int cardVal)
 		{
 			// 1. Check the card is valid then remove this card from player.Cards <List>
