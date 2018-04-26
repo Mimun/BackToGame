@@ -125,16 +125,28 @@ namespace GameFoundation.GameUtils
 			});
 		}
 
+		internal void EarnCardFromOther(Player pl)
+		{
+			Player precededPlayer = pl.PrecededPlayer;
+			int placedCard = precededPlayer.PlacedCard;
+			//	1. Validate to verify whether this card could be take. ?
+			//  2. Set this card to player's earn card
+			pl.EarnedCards.Add(placedCard);
+			//	3. Set this card to preceded's lost card
+			precededPlayer.LostCards.Add(placedCard);
+			//  4. Change player status to placing
+			pl.Status = Player.Stage.Placing;
+			//	5. Inform to all players
+			Players.ForEach(p => p.Send(pl,StaticEvent.TAKE_CARD_FROM_OTHER_SERVER_to_CLIENT,placedCard.ToString()));
+		}
+
 		internal void TakeNewCard(Player pl)
 		{
 			// Take a new Card from Desk
-			if (pl.Status != Player.Stage.Considering) {
+			if (pl.Status != Player.Stage.Considering || RemainCards.Count <= 0)  {
 				return;
 			}
-			if (RemainCards.Count <= 0)
-			{
-				return;
-			}
+			
 			int newCard = RemainCards[0];
 			pl.Cards.Add(newCard);
 			RemainCards.Remove(newCard);
@@ -159,12 +171,14 @@ namespace GameFoundation.GameUtils
 				return;
 			}
 			pl.Cards.Remove(cardVal);
+			pl.PlacedCard = cardVal;
 			// 2. Broadcasd the card was placed to all players
 			Players.ForEach(p => {
 				p.Send(pl, StaticEvent.PLACING_CARD_SERVER_to_CLIENT, cardVal.ToString());
 			});
 			// 3. Change Status of next Player
 			Player nextPlayer = StaticEvent.FindNextPlayer(pl, Players);
+			nextPlayer.PrecededPlayer = pl;
 			pl.Status = Player.Stage.Idle;
 			nextPlayer.Status = Player.Stage.Considering;
 		}

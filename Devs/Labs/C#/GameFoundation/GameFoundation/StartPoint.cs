@@ -89,6 +89,15 @@ namespace GameFoundation
 							Console.WriteLine("Player {0} need a new Card", player.playerName);
 							room.TakeNewCard(player);
 						}
+						//
+						if (expando.msgEvent == StaticEvent.TAKE_CARD_FROM_OTHER_CLIENT_to_SERVER)
+						{
+							Player player;
+							WebSocketClientManager.TryGetValue(socket, out player);
+							Room room = player.playerRoom;
+							Console.WriteLine("Player {0} earn Card form other", player.playerName);
+							room.EarnCardFromOther(player);
+						}
 					}
 					catch (Exception ext)
 					{

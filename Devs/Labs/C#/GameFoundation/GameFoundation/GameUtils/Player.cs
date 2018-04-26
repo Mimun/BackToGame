@@ -22,8 +22,15 @@ namespace GameFoundation.GameUtils
 		public int pos_in_room = -1;
 		public bool isWinner = false;
 		public int lastScore = 0;
+
+		private Player precededPlayer;
+
+
 		//
-		public List<int> Cards = new List<int>();
+		public List<int> Cards = new List<int>();				// Cards in hand
+		public List<int> LostCards = new List<int>(); // Cards were lost to feeding next player :D
+		public List<int> EarnedCards = new List<int>(); // Cards were earned from precededPlayer :D
+		public int PlacedCard = -1;
 		public enum Stage
 		{
 			Idle, Considering, Placing, ShowCards
@@ -63,6 +70,8 @@ namespace GameFoundation.GameUtils
 				this.playerWebsocketList = value;				
 			}
 		}
+
+		public Player PrecededPlayer { get => precededPlayer; set => precededPlayer = value; }
 
 		#region IDisposable Support
 		private bool disposedValue = false; // To detect redundant calls
