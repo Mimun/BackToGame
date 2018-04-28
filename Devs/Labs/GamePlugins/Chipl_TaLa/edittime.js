@@ -83,7 +83,14 @@ AddCondition(10, cf_none, "Check Player is existed", "Game Event", "Player {0} i
 
 AddCondition(11, cf_trigger, "Deal Cards Event", "Game Events", "Deal a Desk of Cards", "Distirbute cards to players", "DealCard");
 
-AddCondition(11, cf_trigger, "Display Start Button", "Game Events", "Start Button for Winner", "Display Start Button", "DisplayStartButton");
+AddCondition(12, cf_trigger, "Display Start Button", "Game Events", "Start Button for Winner", "Display Start Button", "DisplayStartButton");
+
+AddCondition(13, cf_trigger, "User Status is Changing", "Game Events", "User Status is Changing", "User Status is Changing", "UserStatusChange");
+
+AddCondition(14, cf_trigger, "Player Placing Card", "Game Events", "Player Placing Card", "Player Placing Card", "PlayerPlacingCard");
+
+// New card from Desktop is comming
+AddCondition(15, cf_trigger, "New Card from Desktop", "Game Events", "New Card from Desktop", "Player Placing Card", "NewCardFromDesk");
 ////////////////////////////////////////
 // Actions
 
@@ -96,7 +103,7 @@ AddCondition(11, cf_trigger, "Display Start Button", "Game Events", "Start Butto
 //			 script_name);		// corresponding runtime function name
 
 // example
-AddStringParam("Message", "Enter a string to alert.");
+AddAnyTypeParam("Message", "Enter a string to alert.");
 AddAction(0, af_none, "Alert", "My category", "Alert {0}", "Description for my action!", "MyAction");
 
 
@@ -113,6 +120,13 @@ AddStringParam("Data", "A text string to send to the server.");
 AddAction(3, af_none, "Send text", "Data", "Send text <i>{0}</i>", "Send a text string to the server.", "Send");
 // StartGame
 AddAction(4, af_none, "StartGame", "Game Events", "Send Start Game Signal", "Send Start Game command to server.", "SendStartGame");
+// Placing Card
+AddNumberParam("Data", "Send card value to room");
+AddAction(5, af_none, "PlacingCard", "Game Events", "Send Placing Card to server", "Send Placing Card to server.", "PlacingCard");
+
+// Take Card from Desk
+AddAction(6, af_none, "Take new Card from Desk", "Game Events", "Take new Card from Desk", "Take new Card from Desk.", "TakeCardFromDesk");
+
 
 
 ////////////////////////////////////////
@@ -146,6 +160,19 @@ AddNumberParam('Player index:', "get Player Balance")
 AddExpression(5, ef_return_string, "Something special", "Game Expression", "GetPlayerBalance", "Return Player Balance:.");
 
 AddExpression(6, ef_return_number, "Get Left Player Post", "Game Expression", "GetLeftPlayerPos", "Return the postion of Player in Table");
+
+AddExpression(7, ef_return_string, "Get Cards ", "Game Expression", "GetCards", "Return string of Cards");
+
+AddExpression(8, ef_return_string, "Get Current User Status ", "Game Expression", "GetUserStatus", "Return Current User Status");
+
+// Get Placed Card info : Player and value
+AddNumberParam('Type of Info: 0 for position, 1 for value', "get Placed Card Info")
+AddExpression(9, ef_return_number, "Get Placed Card Info ", "Game Expression", "GetPlacedCardInfo", "Return Get Placed Card Info");
+
+// Get new Card info: Player and value
+AddNumberParam('Type of Info: 0 for position, 1 for value', "get Card from Desk Info")
+AddExpression(10, ef_return_number, "Get Placed Card Info ", "Game Expression", "GetNewCardFromDeskInfo", "Return Get Placed Card Info");
+
 
 ACESDone();
 

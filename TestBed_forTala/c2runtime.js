@@ -15141,6 +15141,49 @@ cr.system_object.prototype.loadFromJSON = function (o)
 	};
 })();
 cr.shaders = {};
+cr.shaders["outline"] = {src: ["varying mediump vec2 vTex;",
+"uniform lowp sampler2D samplerFront;",
+"precision highp float;",
+"uniform highp float pixelWidth;",
+"uniform highp float pixelHeight;",
+"uniform highp float red;",
+"uniform highp float green;",
+"uniform highp float blue;",
+"uniform highp float width;",
+"uniform highp float justoutline;",
+"void main(void)",
+"{",
+"vec4 front = texture2D(samplerFront, vTex);",
+"float dx = pixelWidth*width;",
+"float dy = pixelHeight*width;",
+"float diag = 0.7071;",
+"float a0 = texture2D(samplerFront, vTex + vec2(-dx*diag, dy*diag)).a;",
+"float a1 = texture2D(samplerFront, vTex + vec2(dx*diag, -dy*diag)).a;",
+"float a2 = texture2D(samplerFront, vTex + vec2(-dx*diag, -dy*diag)).a;",
+"float a3 = texture2D(samplerFront, vTex + vec2(dx*diag, dy*diag)).a;",
+"float a4 = texture2D(samplerFront, vTex + vec2(-dx, 0.0)).a;",
+"float a5 = texture2D(samplerFront, vTex + vec2(dx, 0.0)).a;",
+"float a6 = texture2D(samplerFront, vTex + vec2(0.0, dy)).a;",
+"float a7 = texture2D(samplerFront, vTex + vec2(0.0, -dy)).a;",
+"float ina=max(max(max(max(max(max(max(a0,a1),a2),a3),a4),a5),a6),a7)-front.a;",
+"if(justoutline!=1.0)",
+"{",
+"float outa = ina + front.a*(1.0-ina);",
+"vec3 outrgb = (vec3(red/255.0, green/255.0, blue/255.0)*ina + front.rgb*front.a*(1.0-ina));",
+"gl_FragColor = vec4(outrgb, outa);",
+"}",
+"else if(ina>0.0)",
+"{",
+"gl_FragColor = vec4(vec3(red/255.0, green/255.0, blue/255.0)*ina, ina);",
+"}",
+"}"
+].join("\n"),
+	extendBoxHorizontal: 0,
+	extendBoxVertical: 0,
+	crossSampling: false,
+	preservesOpaqueness: false,
+	animated: false,
+	parameters: [["red", 0, 0], ["green", 0, 0], ["blue", 0, 0], ["width", 0, 0], ["justoutline", 0, 0]] }
 cr.shaders["warpradial"] = {src: ["varying mediump vec2 vTex;",
 "uniform lowp sampler2D samplerFront;",
 "uniform mediump float seconds;",
@@ -16374,6 +16417,9 @@ cr.plugins_.GameTaLaPlugin = function(runtime)
 	Cnds.prototype.NewCardFromDesk = function (){
 		return true;
 	}
+	Cnds.prototype.EarnCardFromOther = function (){
+		return true;
+	}
 	pluginProto.cnds = new Cnds();
 	function Acts() {};
 	Acts.prototype.MyAction = function (myparam)
@@ -16445,6 +16491,10 @@ cr.plugins_.GameTaLaPlugin = function(runtime)
 							GameHandler.lastPlayerTakeCardFromDesk = player;
 							self.runtime.trigger(cr.plugins_.GameTaLaPlugin.prototype.cnds.NewCardFromDesk,self);
 						break;
+					case "TAKE_CARD_FROM_OTHER_SERVER_to_CLIENT":
+						GameHandler.lastPlayerEarnCard = player;
+						self.runtime.trigger(cr.plugins_.GameTaLaPlugin.prototype.cnds.EarnCardFromOther,self);
+					break;
 				}
         }
 	}
@@ -16485,6 +16535,15 @@ cr.plugins_.GameTaLaPlugin = function(runtime)
 			return;
 		}
 		msg = "TAKE_CARD_FROM_DESK_CLIENT_to_SERVER";
+		sendObj = {	msgEvent: msg}
+		this.ws.send(JSON.stringify(sendObj));
+	};
+	Acts.prototype.EarCardFromOther = function ()
+	{
+		if (!this.ws || this.ws.readyState !== 1 /* OPEN */){
+			return;
+		}
+		msg = "TAKE_CARD_FROM_OTHER_CLIENT_to_SERVER";
 		sendObj = {	msgEvent: msg}
 		this.ws.send(JSON.stringify(sendObj));
 	};
@@ -16556,6 +16615,14 @@ cr.plugins_.GameTaLaPlugin = function(runtime)
 		}
 		if (type == 1){
 			ret.set_int(GameHandler.lastPlayerTakeCardFromDesk.value);
+		}
+	}
+	Exps.prototype.GetEarnedCardInfo = (ret, type)=>{
+		if (type == 0){
+			ret.set_int(GameHandler.lastPlayerEarnCard.post);
+		}
+		if (type == 1){
+			ret.set_int(GameHandler.lastPlayerEarnCard.value);
 		}
 	}
 	pluginProto.exps = new Exps();
@@ -20575,10 +20642,10 @@ cr.getObjectRefTable = function () { return [
 	cr.plugins_.Browser,
 	cr.plugins_.GameTaLaPlugin,
 	cr.plugins_.Function,
-	cr.plugins_.Sprite,
-	cr.plugins_.Text,
-	cr.plugins_.Touch,
 	cr.plugins_.TiledBg,
+	cr.plugins_.Touch,
+	cr.plugins_.Text,
+	cr.plugins_.Sprite,
 	cr.behaviors.Rex_MoveTo,
 	cr.behaviors.DragnDrop,
 	cr.plugins_.Function.prototype.cnds.OnFunction,
@@ -20616,9 +20683,9 @@ cr.getObjectRefTable = function () { return [
 	cr.plugins_.Sprite.prototype.acts.Spawn,
 	cr.system_object.prototype.exps.tokenat,
 	cr.plugins_.Sprite.prototype.acts.SetAnimFrame,
+	cr.plugins_.Sprite.prototype.acts.SetEffectEnabled,
 	cr.behaviors.Rex_MoveTo.prototype.acts.SetTargetPos,
 	cr.plugins_.Sprite.prototype.acts.RotateClockwise,
-	cr.plugins_.Sprite.prototype.acts.SetEffectEnabled,
 	cr.plugins_.Sprite.prototype.acts.SetOpacity,
 	cr.plugins_.Touch.prototype.cnds.OnTapGestureObject,
 	cr.behaviors.Rex_MoveTo.prototype.cnds.CompareSpeed,
@@ -20632,11 +20699,12 @@ cr.getObjectRefTable = function () { return [
 	cr.plugins_.Sprite.prototype.exps.X,
 	cr.plugins_.Sprite.prototype.acts.MoveToTop,
 	cr.plugins_.Sprite.prototype.acts.SetX,
-	cr.plugins_.GameTaLaPlugin.prototype.acts.MyAction,
 	cr.system_object.prototype.cnds.ForEach,
 	cr.plugins_.GameTaLaPlugin.prototype.cnds.UserStatusChange,
 	cr.plugins_.GameTaLaPlugin.prototype.exps.GetUserStatus,
+	cr.plugins_.GameTaLaPlugin.prototype.acts.MyAction,
 	cr.system_object.prototype.cnds.CompareVar,
+	cr.plugins_.TiledBg.prototype.acts.SetEffectParam,
 	cr.plugins_.GameTaLaPlugin.prototype.acts.PlacingCard,
 	cr.plugins_.GameTaLaPlugin.prototype.cnds.PlayerPlacingCard,
 	cr.plugins_.GameTaLaPlugin.prototype.exps.GetPlacedCardInfo,
@@ -20646,6 +20714,9 @@ cr.getObjectRefTable = function () { return [
 	cr.plugins_.GameTaLaPlugin.prototype.exps.GetNewCardFromDeskInfo,
 	cr.behaviors.Rex_MoveTo.prototype.acts.SetTargetPosOnObject,
 	cr.plugins_.Sprite.prototype.cnds.IsOverlapping,
-	cr.behaviors.Rex_MoveTo.prototype.cnds.OnHitTarget
+	cr.behaviors.Rex_MoveTo.prototype.cnds.OnHitTarget,
+	cr.plugins_.GameTaLaPlugin.prototype.acts.EarCardFromOther,
+	cr.plugins_.GameTaLaPlugin.prototype.cnds.EarnCardFromOther,
+	cr.plugins_.GameTaLaPlugin.prototype.exps.GetEarnedCardInfo
 ];};
 

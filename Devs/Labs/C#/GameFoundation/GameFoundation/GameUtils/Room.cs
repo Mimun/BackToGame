@@ -130,7 +130,7 @@ namespace GameFoundation.GameUtils
 			Player precededPlayer = pl.PrecededPlayer;
 			int placedCard = precededPlayer.PlacedCard;
 			//	1. Validate to verify whether this card could be take. ?
-			//  2. Set this card to player's earn card
+			//  2. Set this card to player's earn cards list
 			pl.EarnedCards.Add(placedCard);
 			//	3. Set this card to preceded's lost card
 			precededPlayer.LostCards.Add(placedCard);
@@ -170,6 +170,7 @@ namespace GameFoundation.GameUtils
 			{
 				return;
 			}
+			
 			pl.Cards.Remove(cardVal);
 			pl.PlacedCard = cardVal;
 			// 2. Broadcasd the card was placed to all players

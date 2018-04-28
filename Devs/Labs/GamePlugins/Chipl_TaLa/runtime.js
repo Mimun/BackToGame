@@ -239,6 +239,18 @@ cr.plugins_.GameTaLaPlugin = function(runtime)
 		return true;
 	}
 
+	//UserStatusChange
+	Cnds.prototype.UserStatusChange = function (){
+		return true;
+	}
+	// PlayerPlacingCard
+	Cnds.prototype.PlayerPlacingCard = function (){
+		return true;
+	}
+	//NewCardFromDesk
+	Cnds.prototype.NewCardFromDesk = function (){
+		return true;
+	}
 	pluginProto.cnds = new Cnds();
 	
 	//////////////////////////////////////
@@ -249,7 +261,7 @@ cr.plugins_.GameTaLaPlugin = function(runtime)
 	Acts.prototype.MyAction = function (myparam)
 	{
 		// alert the message
-		alert(myparam);
+		console.log(myparam);
 	};
 
 	// Connect to Server
@@ -304,14 +316,33 @@ cr.plugins_.GameTaLaPlugin = function(runtime)
 						console.log("JOIN_OR_CREATE_ROOM_SERVER_to_CLIENT", "post:", player.post, player);					
 						break;
 					case "PLAYER_LEFT_ROOM_SERVER_to_CLIENT":
-						GameHandler.playerInfos = GameHandler.playerInfos.filter(item=>{
-							return item.playerUID != player.playerUID;
-						})
-						GameHandler.leftPlayer = player;
-						self.runtime.trigger(cr.plugins_.GameTaLaPlugin.prototype.cnds.PlayerLeft,self);
+							GameHandler.playerInfos = GameHandler.playerInfos.filter(item=>{
+								return item.playerUID != player.playerUID;
+							})
+							GameHandler.leftPlayer = player;
+							self.runtime.trigger(cr.plugins_.GameTaLaPlugin.prototype.cnds.PlayerLeft,self);
 						break;
-					case "TAKE_START_BUTTON_SERVER_to_CLIENT":
-						self.runtime.trigger(cr.plugins_.GameTaLaPlugin.prototype.cnds.DisplayStartButton,self);
+					case "TAKE_START_BUTTON_SERVER_to_CLIENT":					
+							self.runtime.trigger(cr.plugins_.GameTaLaPlugin.prototype.cnds.DisplayStartButton,self);
+						break;
+					case "START_NEW_GAME_SERVER_to_CLIENT":
+							GameHandler.userInfo.Cards = player.value;
+							console.log("START_NEW_GAME_SERVER_to_CLIENT");
+							console.log(player.value);
+							self.runtime.trigger(cr.plugins_.GameTaLaPlugin.prototype.cnds.DealCard,self);
+						break;
+					case "CHANGE_PLAYER_STATGE_SERVER_to_CLIENT":
+							GameHandler.userInfo.Stage = player.value;
+							self.runtime.trigger(cr.plugins_.GameTaLaPlugin.prototype.cnds.UserStatusChange,self);
+						break;
+					// PlayerPlacingCard
+					case "PLACING_CARD_SERVER_to_CLIENT":
+							GameHandler.lastPlacedPlayer = player;
+							self.runtime.trigger(cr.plugins_.GameTaLaPlugin.prototype.cnds.PlayerPlacingCard,self);
+						break;
+					case "TAKE_CARD_FROM_DESK_SERVER_to_CLIENT":
+							GameHandler.lastPlayerTakeCardFromDesk = player;
+							self.runtime.trigger(cr.plugins_.GameTaLaPlugin.prototype.cnds.NewCardFromDesk,self);
 						break;
 				}
         }
@@ -339,6 +370,29 @@ cr.plugins_.GameTaLaPlugin = function(runtime)
 		}			
 		msg = "START_NEW_GAME_CLIENT_to_SERVER";
 		sendObj = {msgEvent: msg}
+		this.ws.send(JSON.stringify(sendObj));
+	};
+
+	//PlacingCard
+	Acts.prototype.PlacingCard = function (cardVal)
+	{		
+		if (!this.ws || this.ws.readyState !== 1 /* OPEN */){			
+			return;
+		}			
+		msg = "PLACING_CARD_CLIENT_to_SERVER";
+		sendObj = {	msgEvent: msg,
+					cardVal: cardVal}
+		this.ws.send(JSON.stringify(sendObj));
+	};
+	//
+	// TakeCardFromDesk
+	Acts.prototype.TakeCardFromDesk = function ()
+	{		
+		if (!this.ws || this.ws.readyState !== 1 /* OPEN */){			
+			return;
+		}			
+		msg = "TAKE_CARD_FROM_DESK_CLIENT_to_SERVER";
+		sendObj = {	msgEvent: msg}					
 		this.ws.send(JSON.stringify(sendObj));
 	};
 	// ... other actions here ...
@@ -406,8 +460,38 @@ cr.plugins_.GameTaLaPlugin = function(runtime)
 	Exps.prototype.GetLeftPlayerPos = (ret)=>{
 		ret.set_int(GameHandler.leftPlayer.post);
 	}
+	// GetCards
+	Exps.prototype.GetCards = (ret)=>{
+		ret.set_string(GameHandler.userInfo.Cards);
+	}
 
+	//GetUserStatus
+	Exps.prototype.GetUserStatus = (ret)=>{
+		ret.set_string(GameHandler.userInfo.Stage);
+	}
+
+	//GetPlacedCardInfo
+	Exps.prototype.GetPlacedCardInfo = (ret, type)=>{
+		if (type == 0){
+			ret.set_int(GameHandler.lastPlacedPlayer.post);
+		}
+		if (type == 1){
+			ret.set_int(GameHandler.lastPlacedPlayer.value);
+		}		
+	}
+
+	// GetNewCardFromDeskInfo
+	Exps.prototype.GetNewCardFromDeskInfo = (ret, type)=>{
+		if (type == 0){
+			ret.set_int(GameHandler.lastPlayerTakeCardFromDesk.post);
+		}
+		if (type == 1){
+			ret.set_int(GameHandler.lastPlayerTakeCardFromDesk.value);
+		}		
+	}
 	// ... other expressions here ...
+	
+
 	
 	pluginProto.exps = new Exps();
 
