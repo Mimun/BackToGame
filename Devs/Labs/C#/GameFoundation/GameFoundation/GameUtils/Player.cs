@@ -48,9 +48,22 @@ namespace GameFoundation.GameUtils
 			{
 
 				_stage = value;
+
+
+				Send(this, StaticEvent.CHANGE_MINE_STATGE_SERVER_to_CLIENT, this._stage.ToString().ToUpper());
+				if (playerRoom != null && _stage != Stage.Idle)
+				{
+					playerRoom.Players.ForEach(p =>
+					{
+						p.Send(this, StaticEvent.CHANGE_PLAYER_STATGE_SERVER_to_CLIENT, this._stage.ToString().ToUpper());
+						Console.WriteLine("from change _stage: {0}  , {1} to {2}", this.playerName, Status, p.playerName);
+					});
+				}
 				// send this status to client;
-				this.Send(this,StaticEvent.CHANGE_PLAYER_STATGE_SERVER_to_CLIENT, this._stage.ToString().ToUpper());
-				Console.WriteLine("from change _stage: {0}  , {1}", this.playerName, Status);				
+				//playerRoom.Players.ForEach(p => {
+
+				//});
+
 
 			}
 		}

@@ -16420,6 +16420,9 @@ cr.plugins_.GameTaLaPlugin = function(runtime)
 	Cnds.prototype.EarnCardFromOther = function (){
 		return true;
 	}
+	Cnds.prototype.PlayerStatusChange = function (){
+		return true;
+	}
 	pluginProto.cnds = new Cnds();
 	function Acts() {};
 	Acts.prototype.MyAction = function (myparam)
@@ -16479,10 +16482,14 @@ cr.plugins_.GameTaLaPlugin = function(runtime)
 							console.log(player.value);
 							self.runtime.trigger(cr.plugins_.GameTaLaPlugin.prototype.cnds.DealCard,self);
 						break;
-					case "CHANGE_PLAYER_STATGE_SERVER_to_CLIENT":
-							GameHandler.userInfo.Stage = player.value;
+					case "CHANGE_MINE_STATGE_SERVER_to_CLIENT":
+							GameHandler.stage = player.value;
 							self.runtime.trigger(cr.plugins_.GameTaLaPlugin.prototype.cnds.UserStatusChange,self);
 						break;
+					case "CHANGE_PLAYER_STATGE_SERVER_to_CLIENT":
+						GameHandler.playerChangeStage = player;
+						self.runtime.trigger(cr.plugins_.GameTaLaPlugin.prototype.cnds.PlayerStatusChange,self);
+					break;
 					case "PLACING_CARD_SERVER_to_CLIENT":
 							GameHandler.lastPlacedPlayer = player;
 							self.runtime.trigger(cr.plugins_.GameTaLaPlugin.prototype.cnds.PlayerPlacingCard,self);
@@ -16599,7 +16606,15 @@ cr.plugins_.GameTaLaPlugin = function(runtime)
 		ret.set_string(GameHandler.userInfo.Cards);
 	}
 	Exps.prototype.GetUserStatus = (ret)=>{
-		ret.set_string(GameHandler.userInfo.Stage);
+		ret.set_string(GameHandler.stage);
+	}
+	Exps.prototype.GetPlayersStatus = (ret, type)=>{
+		if (type == 0){
+			ret.set_int(GameHandler.playerChangeStage.post);
+		}
+		if (type == 1){
+			ret.set_string(GameHandler.playerChangeStage.value);
+		}
 	}
 	Exps.prototype.GetPlacedCardInfo = (ret, type)=>{
 		if (type == 0){
@@ -20285,6 +20300,125 @@ cr.behaviors.DragnDrop = function(runtime)
 }());
 ;
 ;
+cr.behaviors.Flash = function(runtime)
+{
+	this.runtime = runtime;
+};
+(function ()
+{
+	var behaviorProto = cr.behaviors.Flash.prototype;
+	behaviorProto.Type = function(behavior, objtype)
+	{
+		this.behavior = behavior;
+		this.objtype = objtype;
+		this.runtime = behavior.runtime;
+	};
+	var behtypeProto = behaviorProto.Type.prototype;
+	behtypeProto.onCreate = function()
+	{
+	};
+	behaviorProto.Instance = function(type, inst)
+	{
+		this.type = type;
+		this.behavior = type.behavior;
+		this.inst = inst;				// associated object instance to modify
+		this.runtime = type.runtime;
+	};
+	var behinstProto = behaviorProto.Instance.prototype;
+	behinstProto.onCreate = function()
+	{
+		this.ontime = 0;
+		this.offtime = 0;
+		this.stage = 0;			// 0 = on, 1 = off
+		this.stagetimeleft = 0;
+		this.timeleft = 0;
+	};
+	behinstProto.saveToJSON = function ()
+	{
+		return {
+			"ontime": this.ontime,
+			"offtime": this.offtime,
+			"stage": this.stage,
+			"stagetimeleft": this.stagetimeleft,
+			"timeleft": this.timeleft
+		};
+	};
+	behinstProto.loadFromJSON = function (o)
+	{
+		this.ontime = o["ontime"];
+		this.offtime = o["offtime"];
+		this.stage = o["stage"];
+		this.stagetimeleft = o["stagetimeleft"];
+		this.timeleft = o["timeleft"];
+		if (this.timeleft === null)
+			this.timeleft = Infinity;
+	};
+	behinstProto.tick = function ()
+	{
+		if (this.timeleft <= 0)
+			return;		// not flashing
+		var dt = this.runtime.getDt(this.inst);
+		this.timeleft -= dt;
+		if (this.timeleft <= 0)
+		{
+			this.timeleft = 0;
+			this.inst.visible = true;
+			this.runtime.redraw = true;
+			this.runtime.trigger(cr.behaviors.Flash.prototype.cnds.OnFlashEnded, this.inst);
+			return;
+		}
+		this.stagetimeleft -= dt;
+		if (this.stagetimeleft <= 0)
+		{
+			if (this.stage === 0)
+			{
+				this.inst.visible = false;
+				this.stage = 1;
+				this.stagetimeleft += this.offtime;
+			}
+			else
+			{
+				this.inst.visible = true;
+				this.stage = 0;
+				this.stagetimeleft += this.ontime;
+			}
+			this.runtime.redraw = true;
+		}
+	};
+	function Cnds() {};
+	Cnds.prototype.IsFlashing = function ()
+	{
+		return this.timeleft > 0;
+	};
+	Cnds.prototype.OnFlashEnded = function ()
+	{
+		return true;
+	};
+	behaviorProto.cnds = new Cnds();
+	function Acts() {};
+	Acts.prototype.Flash = function (on_, off_, dur_)
+	{
+		this.ontime = on_;
+		this.offtime = off_;
+		this.stage = 1;		// always start off
+		this.stagetimeleft = off_;
+		this.timeleft = dur_;
+		this.inst.visible = false;
+		this.runtime.redraw = true;
+	};
+	Acts.prototype.StopFlashing = function ()
+	{
+		this.timeleft = 0;
+		this.inst.visible = true;
+		this.runtime.redraw = true;
+		return;
+	};
+	behaviorProto.acts = new Acts();
+	function Exps() {};
+	behaviorProto.exps = new Exps();
+}());
+;
+;
 cr.behaviors.Rex_MoveTo = function(runtime)
 {
 	this.runtime = runtime;
@@ -20642,12 +20776,13 @@ cr.getObjectRefTable = function () { return [
 	cr.plugins_.Browser,
 	cr.plugins_.GameTaLaPlugin,
 	cr.plugins_.Function,
-	cr.plugins_.TiledBg,
-	cr.plugins_.Touch,
 	cr.plugins_.Text,
+	cr.plugins_.Touch,
 	cr.plugins_.Sprite,
+	cr.plugins_.TiledBg,
 	cr.behaviors.Rex_MoveTo,
 	cr.behaviors.DragnDrop,
+	cr.behaviors.Flash,
 	cr.plugins_.Function.prototype.cnds.OnFunction,
 	cr.plugins_.Sprite.prototype.cnds.CompareInstanceVar,
 	cr.plugins_.Function.prototype.exps.Param,
@@ -20705,6 +20840,9 @@ cr.getObjectRefTable = function () { return [
 	cr.plugins_.GameTaLaPlugin.prototype.acts.MyAction,
 	cr.system_object.prototype.cnds.CompareVar,
 	cr.plugins_.TiledBg.prototype.acts.SetEffectParam,
+	cr.plugins_.GameTaLaPlugin.prototype.cnds.PlayerStatusChange,
+	cr.plugins_.GameTaLaPlugin.prototype.exps.GetPlayersStatus,
+	cr.behaviors.Flash.prototype.acts.Flash,
 	cr.plugins_.GameTaLaPlugin.prototype.acts.PlacingCard,
 	cr.plugins_.GameTaLaPlugin.prototype.cnds.PlayerPlacingCard,
 	cr.plugins_.GameTaLaPlugin.prototype.exps.GetPlacedCardInfo,

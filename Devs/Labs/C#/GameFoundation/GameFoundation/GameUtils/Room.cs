@@ -89,7 +89,7 @@ namespace GameFoundation.GameUtils
 			
 		}
 		// Send start game signal to all of players
-		public void StartGame() {
+		public void StartGame(Player pl) {
 			List<int> shuffleCards = StaticEvent.CardShuffle();
 
 			// clear all cards remain in each player
@@ -118,7 +118,7 @@ namespace GameFoundation.GameUtils
 			json = string.Join(",", winner.Cards.ToArray());
 			Console.WriteLine("Card on Winner: {0}", json);
 			#endregion
-
+			pl.Status =Player.Stage.Placing;
 			Players.ForEach(p =>
 			{
 				p.Send(p, StaticEvent.START_NEW_GAME_SERVER_to_CLIENT, json = string.Join(",", p.Cards.ToArray()));

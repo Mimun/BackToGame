@@ -17,7 +17,8 @@ namespace GameFoundation.GameUtils
 		public static string START_NEW_GAME_SERVER_to_CLIENT = "START_NEW_GAME_SERVER_to_CLIENT";
 
 
-		public static string CHANGE_PLAYER_STATGE_SERVER_to_CLIENT = "CHANGE_PLAYER_STATGE_SERVER_to_CLIENT";
+		public static string CHANGE_MINE_STATGE_SERVER_to_CLIENT = "CHANGE_MINE_STATGE_SERVER_to_CLIENT";
+		public static string CHANGE_PLAYER_STATGE_SERVER_to_CLIENT = "CHANGE_PLAYER_STATGE_SERVER_to_CLIENT";			// Handle Considering and Placing stage of other players
 
 		public static string PLACING_CARD_CLIENT_to_SERVER = "PLACING_CARD_CLIENT_to_SERVER";
 		public static string PLACING_CARD_SERVER_to_CLIENT = "PLACING_CARD_SERVER_to_CLIENT";

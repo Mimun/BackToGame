@@ -68,7 +68,7 @@ namespace GameFoundation
 							Room room = player.playerRoom;						
 
 							Console.WriteLine("In room {0} and player {1}", room.Name, player.playerName);
-							room.StartGame();
+							room.StartGame(player);
 
 						}
 						//PLACING_CARD_CLIENT_to_SERVER
