@@ -23,13 +23,17 @@ namespace GameFoundation.GameUtils
 		public bool isWinner = false;
 		public int lastScore = 0;
 
+		private bool isFirstShowCardPlayer = false;
+
 		private Player precededPlayer;
+
 
 
 		//
 		public List<int> Cards = new List<int>();				// Cards in hand
 		public List<int> LostCards = new List<int>(); // Cards were lost to feeding next player :D
 		public List<int> EarnedCards = new List<int>(); // Cards were earned from precededPlayer :D
+		public List<int> PlacedCardsList = new List<int>(); // Cards were placed  :D
 		public int PlacedCard = -1;
 		public enum Stage
 		{
@@ -55,8 +59,8 @@ namespace GameFoundation.GameUtils
 				{
 					playerRoom.Players.ForEach(p =>
 					{
-						p.Send(this, StaticEvent.CHANGE_PLAYER_STATGE_SERVER_to_CLIENT, this._stage.ToString().ToUpper());
-						Console.WriteLine("from change _stage: {0}  , {1} to {2}", this.playerName, Status, p.playerName);
+						p.Send(this, StaticEvent.CHANGE_PLAYER_STATGE_SERVER_to_CLIENT, _stage.ToString().ToUpper());
+						Console.WriteLine("from change _stage: {0}  , {1} to {2}", playerName, Status, p.playerName);
 					});
 				}
 				// send this status to client;
@@ -85,6 +89,7 @@ namespace GameFoundation.GameUtils
 		}
 
 		public Player PrecededPlayer { get => precededPlayer; set => precededPlayer = value; }
+		public bool IsFirstShowCardPlayer { get => isFirstShowCardPlayer; set => isFirstShowCardPlayer = value; }
 
 		#region IDisposable Support
 		private bool disposedValue = false; // To detect redundant calls

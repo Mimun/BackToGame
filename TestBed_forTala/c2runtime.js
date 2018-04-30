@@ -16423,6 +16423,9 @@ cr.plugins_.GameTaLaPlugin = function(runtime)
 	Cnds.prototype.PlayerStatusChange = function (){
 		return true;
 	}
+	Cnds.prototype.MovingPlacedCard = function (){
+		return true;
+	}
 	pluginProto.cnds = new Cnds();
 	function Acts() {};
 	Acts.prototype.MyAction = function (myparam)
@@ -16501,6 +16504,10 @@ cr.plugins_.GameTaLaPlugin = function(runtime)
 					case "TAKE_CARD_FROM_OTHER_SERVER_to_CLIENT":
 						GameHandler.lastPlayerEarnCard = player;
 						self.runtime.trigger(cr.plugins_.GameTaLaPlugin.prototype.cnds.EarnCardFromOther,self);
+					break;
+					case "MOVE_PLACEDCARD_FROM_OTHER_SERVER_to_CLIENT":
+						GameHandler.movingCardInfo = player;
+						self.runtime.trigger(cr.plugins_.GameTaLaPlugin.prototype.cnds.MovingPlacedCard,self);
 					break;
 				}
         }
@@ -16638,6 +16645,14 @@ cr.plugins_.GameTaLaPlugin = function(runtime)
 		}
 		if (type == 1){
 			ret.set_int(GameHandler.lastPlayerEarnCard.value);
+		}
+	}
+	Exps.prototype.GetMovingCardInfo = (ret, type)=>{
+		if (type == 0){
+			ret.set_int(GameHandler.movingCardInfo.post);
+		}
+		if (type == 1){
+			ret.set_int(GameHandler.movingCardInfo.value);
 		}
 	}
 	pluginProto.exps = new Exps();
@@ -20776,8 +20791,8 @@ cr.getObjectRefTable = function () { return [
 	cr.plugins_.Browser,
 	cr.plugins_.GameTaLaPlugin,
 	cr.plugins_.Function,
-	cr.plugins_.Text,
 	cr.plugins_.Touch,
+	cr.plugins_.Text,
 	cr.plugins_.Sprite,
 	cr.plugins_.TiledBg,
 	cr.behaviors.Rex_MoveTo,
@@ -20855,6 +20870,8 @@ cr.getObjectRefTable = function () { return [
 	cr.behaviors.Rex_MoveTo.prototype.cnds.OnHitTarget,
 	cr.plugins_.GameTaLaPlugin.prototype.acts.EarCardFromOther,
 	cr.plugins_.GameTaLaPlugin.prototype.cnds.EarnCardFromOther,
-	cr.plugins_.GameTaLaPlugin.prototype.exps.GetEarnedCardInfo
+	cr.plugins_.GameTaLaPlugin.prototype.exps.GetEarnedCardInfo,
+	cr.plugins_.GameTaLaPlugin.prototype.cnds.MovingPlacedCard,
+	cr.plugins_.GameTaLaPlugin.prototype.exps.GetMovingCardInfo
 ];};
 

@@ -4,6 +4,7 @@ using System.Text;
 using Fleck;
 using System.Linq;
 
+
 namespace GameFoundation.GameUtils
 {
 	public static class StaticEvent
@@ -28,6 +29,8 @@ namespace GameFoundation.GameUtils
 
 		public static string TAKE_CARD_FROM_OTHER_CLIENT_to_SERVER = "TAKE_CARD_FROM_OTHER_CLIENT_to_SERVER";
 		public static string TAKE_CARD_FROM_OTHER_SERVER_to_CLIENT = "TAKE_CARD_FROM_OTHER_SERVER_to_CLIENT";
+
+		public static string MOVE_PLACEDCARD_FROM_OTHER_SERVER_to_CLIENT = "MOVE_PLACEDCARD_FROM_OTHER_SERVER_to_CLIENT";
 
 
 
@@ -143,6 +146,39 @@ namespace GameFoundation.GameUtils
 
 
 			return nextPlayer;
+		}
+
+		internal static void SwapFirstShowCard(Player pl, List<Player> players)
+		{
+			Player oldShowCardFirstPlayer = players.Where(p => p.IsFirstShowCardPlayer == true).FirstOrDefault();			
+			Player precededPlayer = pl.PrecededPlayer;
+
+			//Trường hợp 1: -Chưa có bài dưới sàn -> không chuyển bài.
+			int placedCardCount = players.Sum(p => p.PlacedCardsList.Count);
+			if (placedCardCount > 0) {
+				//Trường hợp 2: -Có bài dưới sàn
+				//	a.Bài dịch từ người hạ đầu cũ sang người đánh bị ăn(precededPlayer)
+				int movingCard = oldShowCardFirstPlayer.PlacedCardsList.Last();
+				oldShowCardFirstPlayer.PlacedCardsList.Remove(movingCard);
+				precededPlayer.PlacedCardsList.Add(movingCard);
+				if (precededPlayer != oldShowCardFirstPlayer)
+				{
+					players.ForEach(p =>
+					{
+						p.Send(precededPlayer, StaticEvent.MOVE_PLACEDCARD_FROM_OTHER_SERVER_to_CLIENT, movingCard.ToString());
+					});
+				}
+				
+			}
+
+			//Vị trí hạ đầu dịch 1 theo kim đồng hồ(nextPlayer)
+			Player newShowCardFirstPlayer = FindNextPlayer(oldShowCardFirstPlayer, players);
+			newShowCardFirstPlayer.IsFirstShowCardPlayer = true;
+			oldShowCardFirstPlayer.IsFirstShowCardPlayer = false;
+
+
+
+
 		}
 	}
 }

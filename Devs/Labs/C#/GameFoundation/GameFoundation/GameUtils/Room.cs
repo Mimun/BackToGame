@@ -13,6 +13,7 @@ namespace GameFoundation.GameUtils
 		public List<Player> Players { get; set; } = new List<Player>();
 
 		public List<int> RemainCards;
+		
 
 		enum Stage {
 			Ready,Playing, Finallizing
@@ -92,13 +93,21 @@ namespace GameFoundation.GameUtils
 		public void StartGame(Player pl) {
 			List<int> shuffleCards = StaticEvent.CardShuffle();
 
-			// clear all cards remain in each player
-			Players.ForEach(p => p.Cards = new List<int>());
+			// clear all cards  and other remain in each player
+			Players.ForEach(p => {
+				p.Cards.Clear();
+				p.LostCards.Clear();
+				p.EarnedCards.Clear();
+				p.PlacedCardsList.Clear();
+				p.IsFirstShowCardPlayer = false;
+			});
+			
 			//1. Distribute cards to each player in room. Only one have winner flag
 			Player winner = Players.FirstOrDefault(p => p.isWinner == true);
 			winner.Cards.Add(shuffleCards[0]);
 			shuffleCards.Remove(shuffleCards[0]);
 			winner.Status = Player.Stage.Placing;
+			winner.IsFirstShowCardPlayer = true;
 
 			
 			// Distribute card to each other
@@ -130,14 +139,20 @@ namespace GameFoundation.GameUtils
 			Player precededPlayer = pl.PrecededPlayer;
 			int placedCard = precededPlayer.PlacedCard;
 			//	1. Validate to verify whether this card could be take. ?
+			
+			
 			//  2. Set this card to player's earn cards list
 			pl.EarnedCards.Add(placedCard);
 			//	3. Set this card to preceded's lost card
 			precededPlayer.LostCards.Add(placedCard);
+			precededPlayer.PlacedCardsList.Remove(placedCard);
+
 			//  4. Change player status to placing
 			pl.Status = Player.Stage.Placing;
 			//	5. Inform to all players
 			Players.ForEach(p => p.Send(pl,StaticEvent.TAKE_CARD_FROM_OTHER_SERVER_to_CLIENT,placedCard.ToString()));
+			//	6. Calculate the firsPersonShowCard and then remove placed card from older to newer
+			StaticEvent.SwapFirstShowCard(pl, Players);
 		}
 
 		internal void TakeNewCard(Player pl)
@@ -173,6 +188,7 @@ namespace GameFoundation.GameUtils
 			
 			pl.Cards.Remove(cardVal);
 			pl.PlacedCard = cardVal;
+			pl.PlacedCardsList.Add(cardVal);
 			// 2. Broadcasd the card was placed to all players
 			Players.ForEach(p => {
 				p.Send(pl, StaticEvent.PLACING_CARD_SERVER_to_CLIENT, cardVal.ToString());
